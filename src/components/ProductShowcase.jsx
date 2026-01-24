@@ -102,7 +102,7 @@ const ProductShowcase = () => {
         {!loading && products.length === 0 && (
           <div className="text-center text-gray-400 py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
             <p className="text-xl font-bold">No products available yet.</p>
-            <p className="text-sm">Please add products from the Admin Portal.</p>
+            <p className="text-sm">Palme Admin hasn't uploaded any products yet</p>
           </div>
         )}
       </div>
