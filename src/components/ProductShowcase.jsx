@@ -1,19 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ShoppingBag, Image } from 'lucide-react';
-import { useCart } from '../context/CartContext'; 
-import Preloader from './Preloader';
+import { Link } from 'react-router-dom';
+import { ShoppingCart, ArrowRight } from 'lucide-react';
+import { useCart } from '../context/CartContext';
+import toast from 'react-hot-toast';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const ProductShowcase = () => {
+const ProductShowcase = ({ limit }) => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const sectionRef = useRef(null);
-  
-  const { addToCart } = useCart(); 
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -21,92 +15,60 @@ const ProductShowcase = () => {
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const res = await axios.get(`${API_URL}/api/products`);
         setProducts(res.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        setLoading(false);
+      } catch (err) {
+        console.error(err);
       }
     };
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    if (!loading && products.length > 0) {
-      gsap.fromTo('.product-card', 
-        { y: 50, opacity: 0 },
-        {
-          y: 0, opacity: 1, duration: 0.8, stagger: 0.1,
-          scrollTrigger: { trigger: sectionRef.current, start: "top 80%" }
-        }
-      );
-    }
-  }, [loading, products]);
+  const displayedProducts = limit ? products.slice(0, limit) : products;
 
   return (
-    <div ref={sectionRef} className="py-24 bg-white relative min-h-[600px]">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          
-          <span className="text-palmeGreen/60 font-bold tracking-widest uppercase text-xs">Fresh from the Farm</span>
-          
-          <h2 className="text-gray-900 font-serif text-4xl md:text-5xl font-bold mb-4 mt-2">
-            Pure Selections
-          </h2>
-          <p className="text-gray-500 max-w-2xl mx-auto font-light">
-            Choose the perfect size for your needs. 100% filtered, unadulterated palm oil.
-          </p>
-        </div>
+    <section className="py-20 px-6 max-w-7xl mx-auto">
+       <div className="flex justify-between items-end mb-12">
+            <div>
+                <span className="text-palmeGreen font-bold tracking-widest uppercase text-xs">Our Collection</span>
+                <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mt-2">Premium Palm Products</h2>
+            </div>
+            {limit && (
+                <Link to="/shop" className="hidden md:flex items-center gap-2 text-palmeGreen font-bold hover:underline">
+                    View All Products <ArrowRight size={16} />
+                </Link>
+            )}
+       </div>
 
-        {loading ? (
-          <Preloader />
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products.map((item) => (
-              <div key={item._id} className="product-card group bg-white rounded-3xl p-6 relative transition-all hover:shadow-2xl hover:-translate-y-2 border border-gray-100 flex flex-col">
-                
-                
-                <span className="absolute top-4 right-4 bg-gray-50 text-gray-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                  {item.size}
-                </span>
-
-                
-                <div className="h-48 w-full bg-gray-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform overflow-hidden relative">
-                   {item.image ? (
-                      <img src={item.image} alt={item.name} className="w-full h-full object-contain p-4" />
-                   ) : (
-                      <div className="text-gray-300">
-                         <Image size={64} strokeWidth={1} />
-                      </div>
-                   )}
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {displayedProducts.map((product) => (
+             <div key={product._id} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all group relative">
+                <div className="h-64 bg-gray-50 rounded-xl mb-4 overflow-hidden relative">
+                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                    
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                         <button onClick={() => { addToCart(product); toast.success("Added to cart"); }} className="bg-white p-3 rounded-full text-gray-900 hover:bg-palmeGreen hover:text-white transition-colors">
+                            <ShoppingCart size={18} />
+                         </button>
+                    </div>
                 </div>
-
-                <div className="text-center mb-6">
-                  <h3 className="text-lg font-bold text-gray-900">{item.name}</h3>
-                  
-                  <p className="text-palmeGreen font-serif font-bold text-2xl mt-2">₦{item.price.toLocaleString()}</p>
+                <h3 className="font-bold text-gray-900 text-lg">{product.name}</h3>
+                <p className="text-gray-500 text-sm mb-3">{product.size}</p>
+                <div className="flex justify-between items-center">
+                    <span className="font-bold text-palmeGreen text-xl">₦{product.price.toLocaleString()}</span>
+                    
+                    
                 </div>
-                
-                
-                <button 
-                  onClick={() => addToCart(item)}
-                  className="w-full mt-auto bg-palmeGreen hover:bg-green-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-900/10 transition-all flex items-center justify-center gap-2 transform active:scale-95"
-                >
-                  <ShoppingBag size={18} />
-                  Add to Cart
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {!loading && products.length === 0 && (
-          <div className="text-center text-gray-400 py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-            <p className="text-xl font-bold">No products available yet.</p>
-            <p className="text-sm">Palme Admin hasn't uploaded any products yet</p>
-          </div>
-        )}
-      </div>
-    </div>
+             </div>
+          ))}
+       </div>
+
+       {limit && (
+           <div className="mt-12 text-center md:hidden">
+               <Link to="/shop" className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-full font-bold">
+                   View All Products <ArrowRight size={16} />
+               </Link>
+           </div>
+       )}
+    </section>
   );
 };
 

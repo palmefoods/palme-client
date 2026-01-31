@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom'; 
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faTrash, faTruck, faMapMarkerAlt, faInfoCircle, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTrash, faTruck, faMapMarkerAlt, faInfoCircle, faImage, faArrowRight } from '@fortawesome/free-solid-svg-icons'; 
 import { useCart } from '../context/CartContext';
 
 const CartDrawer = () => {
@@ -13,13 +14,12 @@ const CartDrawer = () => {
   const [parks, setParks] = useState([]);
   const [loadingParks, setLoadingParks] = useState(false);
 
-  
   useEffect(() => {
     const fetchParks = async () => {
       setLoadingParks(true);
       try {
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const res = await axios.get(`${API_URL}/api/locations`);;
+        const res = await axios.get(`${API_URL}/api/locations`);
         setParks(res.data);
       } catch (err) {
         console.error("Failed to load parks", err);
@@ -78,14 +78,16 @@ const CartDrawer = () => {
                    )}
                 </div>
                 
+                
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-800 font-serif">{item.name}</h3>
                   <p className="text-sm text-gray-500">{item.size}</p>
                   <p className="text-palmeGreen font-bold mt-1">₦{item.price.toLocaleString()}</p>
                 </div>
                 
+                
                 <div className="flex flex-col items-end justify-between">
-                  <button onClick={() => removeFromCart(item._id)} className="text-gray-300 hover:text-palmeRed transition-colors">
+                  <button onClick={() => removeFromCart(item._id)} className="text-gray-300 hover:text-red-500 transition-colors">
                     <FontAwesomeIcon icon={faTrash} />
                   </button>
                   <span className="font-bold text-gray-800 bg-gray-100 px-2 py-1 rounded text-xs">x{item.qty}</span>
@@ -100,7 +102,6 @@ const CartDrawer = () => {
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
                 <FontAwesomeIcon icon={faTruck} className="text-palmeGreen"/> Delivery Method
               </h3>
-              
               
               <div className="flex bg-white p-1 rounded-lg border border-gray-200 mb-4 shadow-sm">
                 <button 
@@ -117,7 +118,6 @@ const CartDrawer = () => {
                 </button>
               </div>
 
-              
               {deliveryType === 'doorstep' && (
                 <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-100 flex gap-3">
                     <FontAwesomeIcon icon={faInfoCircle} className="mt-1 text-blue-500 shrink-0"/>
@@ -125,7 +125,6 @@ const CartDrawer = () => {
                 </div>
               )}
 
-              
               {deliveryType === 'park' && (
                 <div className="space-y-3">
                   {loadingParks ? (
@@ -150,7 +149,6 @@ const CartDrawer = () => {
                         ))}
                       </select>
 
-                      
                       {selectedLocation && (
                          <div className="mt-2 bg-yellow-50 p-3 rounded-lg border border-yellow-100 text-sm animate-pulse">
                             <p className="font-bold text-yellow-800 text-xs uppercase mb-1">Pickup Instruction:</p>
@@ -173,10 +171,13 @@ const CartDrawer = () => {
               <span className="text-gray-500 font-medium">Subtotal</span>
               <span className="text-2xl font-bold text-palmeGreen">₦{cartTotal.toLocaleString()}</span>
             </div>
-            
-            <button className="w-full bg-palmeRed hover:bg-red-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-900/20 transition-transform hover:scale-[1.02] flex items-center justify-center gap-2">
-              Proceed to Checkout
-            </button>
+            <Link 
+              to="/checkout"
+              onClick={() => setIsCartOpen(false)}
+              className="w-full bg-palmeGreen hover:bg-green-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-900/20 transition-transform hover:scale-[1.02] flex items-center justify-center gap-2"
+            >
+              Proceed to Checkout <FontAwesomeIcon icon={faArrowRight} />
+            </Link>
           </div>
         )}
       </div>

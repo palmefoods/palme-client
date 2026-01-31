@@ -10,6 +10,31 @@
   --palme-cream: #fcfdfc; 
 }
 
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+  
+  .animate-bounce-slow {
+    animation: bounce 3s infinite;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--palme-cream);
@@ -25,4 +50,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 .swiper-button-next, .swiper-button-prev {
   color: white !important;
+}
+
+@media print {
+    
+    div[role="status"], 
+    div[class*="go"], 
+    .Toaster {
+        display: none !important;
+    }
 }
