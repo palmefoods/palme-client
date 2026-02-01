@@ -12,7 +12,7 @@ const Checkout = () => {
     const { user, setShowAuthModal } = useAuth();
     const navigate = useNavigate();
 
-    // Form State
+    
     const [email, setEmail] = useState(user?.email || '');
     const [firstName, setFirstName] = useState(user?.name?.split(' ')[0] || '');
     const [lastName, setLastName] = useState(user?.name?.split(' ')[1] || '');
@@ -20,12 +20,12 @@ const Checkout = () => {
     const [phone, setPhone] = useState(user?.phone || '');
     const [selectedState, setSelectedState] = useState(selectedLocation?.state || '');
 
-    // Discount State
+    
     const [couponCode, setCouponCode] = useState('');
     const [discount, setDiscount] = useState(0);
-    const [isCouponApplied, setIsCouponApplied] = useState(false); // ✅ Track status
+    const [isCouponApplied, setIsCouponApplied] = useState(false); 
 
-    // Data State
+    
     const [parks, setParks] = useState([]);
     const [settings, setSettings] = useState({
         doorstep_price: 10000,
@@ -37,7 +37,7 @@ const Checkout = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+                const API_URL = import.meta.env.VITE_API_URL || 'http:
                 const parksRes = await axios.get(`${API_URL}/api/locations`);
                 if (Array.isArray(parksRes.data)) setParks(parksRes.data);
 
@@ -67,16 +67,16 @@ const Checkout = () => {
         }
     }, [selectedLocation]);
 
-    // Calculations
+    
     const filteredParks = Array.isArray(parks) ? parks.filter(p => p?.state?.toLowerCase() === selectedState.toLowerCase()) : [];
     const shippingFee = deliveryType === 'doorstep' ? Number(settings.doorstep_price) : Number(settings.park_price);
     
-    // ✅ TOTAL CALCULATION
+    
     const finalTotal = (cartTotal || 0) + shippingFee - discount;
 
     const [reference] = useState((new Date()).getTime().toString());
 
-    // ✅ APPLY COUPON
+    
     const handleApplyCoupon = () => {
         if (!couponCode.trim()) {
             toast.error("Please enter a coupon code first.");
@@ -105,7 +105,7 @@ const Checkout = () => {
 
         if (applied) {
             setDiscount(totalDiscount);
-            setIsCouponApplied(true); // ✅ Lock the field
+            setIsCouponApplied(true); 
             toast.success(`Coupon Applied! You saved ₦${totalDiscount.toLocaleString()}`);
         } else {
             toast.error("Invalid coupon code, or it doesn't apply to items in your cart.");
@@ -113,7 +113,7 @@ const Checkout = () => {
         }
     };
 
-    // ✅ REMOVE COUPON
+    
     const handleRemoveCoupon = () => {
         setDiscount(0);
         setCouponCode('');
@@ -134,7 +134,7 @@ const Checkout = () => {
         };
 
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const API_URL = import.meta.env.VITE_API_URL || 'http:
             
             const response = await fetch(`${API_URL}/api/orders`, {
                 method: 'POST',
@@ -182,13 +182,13 @@ const Checkout = () => {
         else if (deliveryType === 'park' && !selectedLocation) toast.error("Select park");
     };
 
-    // New "Smart" Network Test
+    
     const testConnection = async () => {
         const toastId = toast.loading("Analyzing network stability...");
         const startTime = Date.now();
         
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const API_URL = import.meta.env.VITE_API_URL || 'http:
             await fetch(`${API_URL}/api/products?limit=1`); 
             
             const endTime = Date.now();
