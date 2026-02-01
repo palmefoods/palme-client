@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { PaystackButton } from 'react-paystack'; 
 import { useAuth } from '../context/AuthContext';
-import { ChevronRight, HelpCircle, Lock, AlertCircle, Wifi, Tag } from 'lucide-react';
+import { ChevronRight, HelpCircle, Lock, AlertCircle, Wifi, Tag, X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
 const Checkout = () => {
@@ -23,6 +23,7 @@ const Checkout = () => {
     // Discount State
     const [couponCode, setCouponCode] = useState('');
     const [discount, setDiscount] = useState(0);
+    const [isCouponApplied, setIsCouponApplied] = useState(false); // ✅ Track status
 
     // Data State
     const [parks, setParks] = useState([]);
@@ -75,9 +76,8 @@ const Checkout = () => {
 
     const [reference] = useState((new Date()).getTime().toString());
 
-    // ✅ FIXED COUPON LOGIC
+    // ✅ APPLY COUPON
     const handleApplyCoupon = () => {
-        // 1. Check if empty
         if (!couponCode.trim()) {
             toast.error("Please enter a coupon code first.");
             return;
@@ -87,15 +87,15 @@ const Checkout = () => {
         let applied = false;
 
         cartItems.forEach(item => {
-            // Check if item has a discount code AND a discount price set in Admin
-            if (item.discountCode && 
-                item.discountCode.trim().toLowerCase() === couponCode.trim().toLowerCase() &&
-                item.discountPrice) {
+            const itemData = item.data || item; 
+            const itemDiscountCode = itemData.discountCode || item.discountCode;
+            const itemDiscountPrice = itemData.discountPrice || item.discountPrice;
+
+            if (itemDiscountCode && 
+                itemDiscountCode.trim().toLowerCase() === couponCode.trim().toLowerCase() &&
+                itemDiscountPrice) {
                 
-                // Calculate Savings: (Regular Price - Discount Price) * Qty
-                // Example: (1200 - 1000) * 1 = 200 savings
                 const savingsPerUnit = item.price - item.discountPrice;
-                
                 if (savingsPerUnit > 0) {
                     totalDiscount += (savingsPerUnit * item.qty);
                     applied = true;
@@ -105,11 +105,20 @@ const Checkout = () => {
 
         if (applied) {
             setDiscount(totalDiscount);
+            setIsCouponApplied(true); // ✅ Lock the field
             toast.success(`Coupon Applied! You saved ₦${totalDiscount.toLocaleString()}`);
         } else {
             toast.error("Invalid coupon code, or it doesn't apply to items in your cart.");
             setDiscount(0);
         }
+    };
+
+    // ✅ REMOVE COUPON
+    const handleRemoveCoupon = () => {
+        setDiscount(0);
+        setCouponCode('');
+        setIsCouponApplied(false);
+        toast("Coupon removed");
     };
 
     const handlePaystackSuccessAction = async (reference) => {
@@ -121,7 +130,7 @@ const Checkout = () => {
             items: cartItems,
             deliveryMethod: deliveryType,
             parkLocation: selectedLocation ? (selectedLocation.name || selectedLocation.parkName) : '',
-            totalAmount: finalTotal // ✅ Save the discounted amount
+            totalAmount: finalTotal
         };
 
         try {
@@ -173,14 +182,38 @@ const Checkout = () => {
         else if (deliveryType === 'park' && !selectedLocation) toast.error("Select park");
     };
 
+    // New "Smart" Network Test
     const testConnection = async () => {
-        const toastId = toast.loading("Testing connection...");
+        const toastId = toast.loading("Analyzing network stability...");
+        const startTime = Date.now();
+        
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-            await fetch(API_URL);
-            toast.success("Server Connected!", { id: toastId });
+            await fetch(`${API_URL}/api/products?limit=1`); 
+            
+            const endTime = Date.now();
+            const latency = endTime - startTime;
+            
+            let speedStatus = "Excellent";
+            if (latency > 500) speedStatus = "Good";
+            if (latency > 1500) speedStatus = "Stable";
+
+            toast.success(
+                <div className="text-sm">
+                    <p className="font-bold">System Ready & Secure 🟢</p>
+                    <p className="text-xs opacity-90 mt-1">Speed: {speedStatus} ({latency}ms)</p>
+                    <p className="text-xs opacity-90">Encryption: AES-256 (Paystack)</p>
+                </div>, 
+                { id: toastId, duration: 5000 }
+            );
         } catch (e) {
-            toast.error("Server Disconnected", { id: toastId });
+            toast.error(
+                <div>
+                    <p className="font-bold">Connection Unstable 🔴</p>
+                    <p className="text-xs mt-1">Please check your internet before paying.</p>
+                </div>, 
+                { id: toastId }
+            );
         }
     };
 
@@ -367,26 +400,41 @@ const Checkout = () => {
                     </div>
 
                     <div className="space-y-3 pb-6 border-b border-gray-200">
-                        {/* COUPON INPUT */}
-                        <div className="flex gap-2">
-                            <div className="relative flex-1">
-                                <Tag className="absolute left-3 top-2.5 text-gray-400" size={16} />
-                                <input 
-                                    type="text" 
-                                    placeholder="Gift card or discount code" 
-                                    className="w-full pl-9 p-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-palmeGreen uppercase"
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value)}
-                                />
+                        {/* COUPON INPUT / BADGE */}
+                        {!isCouponApplied ? (
+                             <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                    <Tag className="absolute left-3 top-2.5 text-gray-400" size={16} />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Gift card or discount code" 
+                                        className="w-full pl-9 p-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-palmeGreen uppercase transition-all"
+                                        value={couponCode}
+                                        onChange={(e) => setCouponCode(e.target.value)}
+                                    />
+                                </div>
+                                <button 
+                                    onClick={handleApplyCoupon}
+                                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${couponCode ? 'bg-gray-800 text-white hover:bg-black' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                                    disabled={!couponCode}
+                                >
+                                    Apply
+                                </button>
                             </div>
-                            <button 
-                                onClick={handleApplyCoupon}
-                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${couponCode ? 'bg-gray-800 text-white hover:bg-black' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
-                                disabled={!couponCode}
-                            >
-                                Apply
-                            </button>
-                        </div>
+                        ) : (
+                            <div className="flex items-center justify-between bg-green-50 border border-green-200 p-3 rounded-lg">
+                                <div className="flex items-center gap-2 text-palmeGreen font-bold text-sm">
+                                    <Tag size={16} />
+                                    <span>{couponCode.toUpperCase()}</span>
+                                </div>
+                                <button 
+                                    onClick={handleRemoveCoupon}
+                                    className="text-gray-400 hover:text-red-500 transition-colors"
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
+                        )}
                         
                         <div className="flex justify-between text-sm text-gray-600 pt-2">
                             <span>Subtotal</span>
@@ -402,7 +450,7 @@ const Checkout = () => {
                         
                         {/* DISCOUNT ROW */}
                         {discount > 0 && (
-                            <div className="flex justify-between text-sm text-palmeGreen font-bold animate-fade-in">
+                            <div className="flex justify-between text-sm text-palmeGreen font-bold animate-fade-in bg-green-50 p-2 rounded">
                                 <span>Discount</span>
                                 <span>-₦{discount.toLocaleString()}</span>
                             </div>

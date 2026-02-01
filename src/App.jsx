@@ -125,7 +125,7 @@ function App() {
               
               <Route path="/testimonials" element={<TestimonialsPage />} />
               
-              <Route path="/bulk-orders" element={<BulkOrder />} />
+              <Route path="/custom-orders" element={<BulkOrder />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/contact" element={<Contact />} />

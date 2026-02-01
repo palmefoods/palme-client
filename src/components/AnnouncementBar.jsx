@@ -3,6 +3,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF, faInstagram, faTwitter, faWhatsapp, faTiktok } from '@fortawesome/free-brands-svg-icons';
 import { faPhone, faEnvelope, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -12,83 +13,83 @@ const AnnouncementBar = () => {
 
   const fetchAnnouncement = async () => {
     try {
-     
       const res = await axios.get(`${API_URL}/api/content/announcement?t=${new Date().getTime()}`);
-      
       if (res.data && res.data.length > 0) {
-       
         const newestItem = res.data[res.data.length - 1];
         setAnnouncement(newestItem.data);
       }
     } catch (err) {
-      console.error("Failed to load announcement", err);
+      console.error("Failed to load announcement");
     }
   };
 
   useEffect(() => {
     fetchAnnouncement();
-
-   
     const interval = setInterval(fetchAnnouncement, 10000);
     return () => clearInterval(interval);
   }, []);
 
- 
   if (!announcement || announcement.show === false || !isVisible) return null;
 
   return (
-    <div 
-      className={`${announcement.color || 'bg-palmeGreen'} text-white overflow-hidden transition-all duration-500 ease-in-out ${
-        isVisible ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
-      }`}
-    >
-      <div className="py-2.5 px-4 text-[10px] md:text-xs font-bold uppercase tracking-widest relative">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          
-          
-          <div className="hidden md:flex gap-6 items-center opacity-80 hover:opacity-100 transition-opacity">
-            <span className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faPhone} /> +2349134033103
-            </span>
-            <span className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faEnvelope} /> nali@palmefoods.com
-            </span>
-          </div>
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div 
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className={`${announcement.color || 'bg-palmeGreen'} text-white relative z-50`}
+        >
+          <div className="py-2.5 px-4 text-[10px] md:text-xs font-bold uppercase tracking-widest">
+            <div className="max-w-7xl mx-auto flex justify-between items-center gap-4">
+              
+              
+              <div className="hidden lg:flex gap-6 items-center opacity-80 hover:opacity-100 transition-opacity">
+                <span className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faPhone} /> +2349134033103
+                </span>
+                <span className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faEnvelope} /> nali@palmefoods.com
+                </span>
+              </div>
 
-          
-          <div className="flex-1 text-center pr-8 md:pr-0 truncate px-2">
-            <span className="animate-pulse">{announcement.text}</span> 
-            
-            {announcement.code && (
-              <>
-                <span className="ml-2 text-white/90 font-medium normal-case hidden sm:inline">Use Code: </span>
-                <span className="bg-white text-palmeRed px-2 py-0.5 rounded ml-1 font-bold">{announcement.code}</span>
-              </>
-            )}
-          </div>
+              
+              <div className="flex-1 text-left lg:text-center truncate">
+                <span className="animate-pulse mr-2">{announcement.text}</span> 
+                
+                {announcement.code && (
+                  <span className="inline-block bg-white/20 border border-white/30 px-2 py-0.5 rounded text-white font-mono">
+                     CODE: <span className="font-bold text-palmeGold">{announcement.code}</span>
+                  </span>
+                )}
+              </div>
 
-          
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex gap-4 items-center border-r border-white/20 pr-4">
-              <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faFacebookF} /></a>
-              <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faInstagram} /></a>
-              <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faTwitter} /></a>
-              <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faWhatsapp} size="lg" /></a>
-              <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faTiktok} /></a>
+              
+              <div className="flex items-center gap-3 md:gap-4 shrink-0">
+                <div className="flex gap-3 items-center border-r border-white/20 pr-3 md:pr-4">
+                  
+                  <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faFacebookF} /></a>
+                  <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faInstagram} /></a>
+                  <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faTwitter} /></a>
+                  <a href="https://www.tiktok.com/@palmefoods" target="_blank" rel="noreferrer" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faTiktok} /></a>
+                  <a href="https://wa.me/2349134033103" target="_blank" rel="noreferrer" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faWhatsapp} size="lg" /></a>
+                </div>
+
+                <button 
+                  onClick={() => setIsVisible(false)} 
+                  className="text-white/60 hover:text-white transition-colors transform hover:rotate-90 duration-300"
+                  aria-label="Close Announcement"
+                >
+                  <FontAwesomeIcon icon={faTimes} size="lg" />
+                </button>
+              </div>
+              
             </div>
-
-            <button 
-              onClick={() => setIsVisible(false)} 
-              className="text-white/60 hover:text-white transition-colors p-1 transform hover:rotate-90 duration-300"
-              aria-label="Close Announcement"
-            >
-              <FontAwesomeIcon icon={faTimes} size="lg" />
-            </button>
           </div>
-          
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
