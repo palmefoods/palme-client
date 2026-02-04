@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { PaystackButton } from 'react-paystack'; 
 import { useAuth } from '../context/AuthContext';
-import { ChevronRight, HelpCircle, Lock, AlertCircle, Tag, X, Truck, Info } from 'lucide-react';
+import { ChevronRight, HelpCircle, Lock, AlertCircle, Tag, X, Truck, Info, Heart } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
 const Checkout = () => {
@@ -23,6 +23,9 @@ const Checkout = () => {
     const [discount, setDiscount] = useState(0);
     const [isCouponApplied, setIsCouponApplied] = useState(false); 
     
+    
+    const [tipPercentage, setTipPercentage] = useState(0);
+
     const [parks, setParks] = useState([]);
     const [settings, setSettings] = useState({
         doorstep_price: 10000,
@@ -37,8 +40,6 @@ const Checkout = () => {
         const fetchData = async () => {
             try {
                 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-                
-                // Fetch Settings and Parks
                 const [parksRes, settingsRes] = await Promise.all([
                     axios.get(`${API_URL}/api/locations`),
                     axios.get(`${API_URL}/api/settings`)
@@ -65,14 +66,12 @@ const Checkout = () => {
         }
     }, [user]);
 
-    // Handle Location Selection updates
     useEffect(() => {
         if (selectedLocation && selectedLocation.state) {
             setSelectedState(selectedLocation.state);
         }
     }, [selectedLocation]);
 
-    // ✅ HELPER: Safely clean and parse prices
     const getNumericPrice = (priceVal) => {
         if (priceVal === undefined || priceVal === null) return 0;
         const cleanString = priceVal.toString().replace(/,/g, '');
@@ -82,12 +81,10 @@ const Checkout = () => {
 
     const filteredParks = Array.isArray(parks) ? parks.filter(p => p?.state?.toLowerCase() === selectedState.toLowerCase()) : [];
     
-    // ✅ FIXED: SHIPPING FEE CALCULATION
     let shippingFee = 0;
     if (deliveryType === 'doorstep') {
         shippingFee = getNumericPrice(settings.doorstep_price);
     } else {
-        // Look for 'basePrice' specifically (based on your Schema)
         if (selectedLocation) {
             shippingFee = getNumericPrice(selectedLocation.basePrice || selectedLocation.price || settings.park_price);
         } else {
@@ -101,10 +98,14 @@ const Checkout = () => {
         ? settings.heavy_weight_note.replace('[limit]', weightLimit)
         : `Your order exceeds ${weightLimit}kg. Additional shipping charges may apply.`;
 
-    const finalTotal = (cartTotal || 0) + shippingFee - discount;
+    
+    const tipAmount = (cartTotal * tipPercentage) / 100;
+
+    
+    const finalTotal = (cartTotal || 0) + shippingFee - discount + tipAmount;
+    
     const [reference] = useState((new Date()).getTime().toString());
 
-    // ✅ FIXED COUPON LOGIC (Connects to Server)
     const handleApplyCoupon = async () => {
         if (!couponCode.trim()) {
             toast.error("Enter a code first.");
@@ -113,7 +114,6 @@ const Checkout = () => {
 
         const code = couponCode.trim().toUpperCase();
 
-        // 1. Global Welcome Check (Optional Hardcoded)
         if (code === 'WELCOME') {
             const welcomeDiscount = cartTotal * 0.10;
             setDiscount(welcomeDiscount);
@@ -122,7 +122,6 @@ const Checkout = () => {
             return;
         }
 
-        // 2. Server Verification
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
             const res = await axios.post(`${API_URL}/api/coupons/verify`, { code });
@@ -161,7 +160,9 @@ const Checkout = () => {
             parkLocation: selectedLocation ? (selectedLocation.name || selectedLocation.parkName) : '',
             totalAmount: finalTotal,
             totalWeight: totalWeight, 
-            isHeavy: isHeavy
+            isHeavy: isHeavy,
+            
+            tipAmount: tipAmount 
         };
 
         try {
@@ -219,7 +220,7 @@ const Checkout = () => {
 
         <div className="w-full max-w-6xl bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col lg:flex-row border border-gray-200">
             
-            {/* LEFT COLUMN */}
+            
             <div className="w-full lg:w-[58%] lg:pr-14 lg:pl-10 pt-10 pb-12 px-6 order-2 lg:order-1 bg-white">
                 
                 <div className="mb-6 flex justify-between items-center">
@@ -371,7 +372,7 @@ const Checkout = () => {
                 </div>
             </div>
 
-            {/* RIGHT COLUMN */}
+            
             <div className="w-full lg:w-[42%] bg-[#FAFAFA] border-l border-gray-200 pt-10 px-6 lg:pl-10 lg:pr-14 order-1 lg:order-2">
                 <div className="lg:sticky lg:top-10 max-w-md mx-auto lg:mx-0">
                     <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
@@ -397,7 +398,7 @@ const Checkout = () => {
                     </div>
 
                     <div className="space-y-3 pb-6 border-b border-gray-200">
-                        {/* COUPON INPUT */}
+                        
                         {!isCouponApplied ? (
                              <div className="flex gap-2">
                                 <div className="relative flex-1">
@@ -442,6 +443,35 @@ const Checkout = () => {
                                 <span>-₦{discount.toLocaleString()}</span>
                             </div>
                         )}
+
+                        
+                        <div className="pt-4 border-t border-dashed border-gray-200">
+                            <div className="flex items-center gap-1 text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
+                                <Heart size={12} className="text-palmeRed" /> Support the Team (Optional)
+                            </div>
+                            <div className="flex gap-2">
+                                {[0, 5, 10, 15].map((pct) => (
+                                    <button
+                                        key={pct}
+                                        onClick={() => setTipPercentage(pct)}
+                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all border ${
+                                            tipPercentage === pct 
+                                            ? 'bg-gray-800 text-white border-gray-800' 
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                                        }`}
+                                    >
+                                        {pct === 0 ? 'None' : `${pct}%`}
+                                    </button>
+                                ))}
+                            </div>
+                            {tipPercentage > 0 && (
+                                <div className="flex justify-between text-sm text-gray-600 mt-2 animate-fade-in">
+                                    <span>Tip ({tipPercentage}%)</span>
+                                    <span className="font-medium text-gray-900">₦{tipAmount.toLocaleString()}</span>
+                                </div>
+                            )}
+                        </div>
+
                     </div>
 
                     <div className="flex justify-between items-center pt-6">

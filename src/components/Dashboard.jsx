@@ -238,7 +238,7 @@ const Dashboard = () => {
 
                 <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
                     <button 
-                        onClick={() => alert("Support chat coming soon!")}
+                        onClick={() => window.location.href="https://wa.me/+2349134033103"}
                         className="text-gray-500 font-bold hover:text-palmeGreen text-sm"
                     >
                         Need Help?

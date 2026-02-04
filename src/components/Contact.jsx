@@ -11,6 +11,7 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    subject: '', 
     message: ''
   });
   const [loading, setLoading] = useState(false);
@@ -24,19 +25,19 @@ const Contact = () => {
     try {
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         
-        // We reuse the custom-request endpoint, mapping the fields to fit
-        await axios.post(`${API_URL}/api/custom-request`, {
+        
+        await axios.post(`${API_URL}/api/contact`, {
             name: formData.name,
             email: formData.email,
-            productType: "General Inquiry", // Hardcoded for context
-            quantity: "N/A",
+            subject: formData.subject || "General Inquiry",
             message: formData.message
         });
 
         toast.success("Message sent! We'll get back to you soon.");
-        setFormData({ name: '', email: '', message: '' });
+        setFormData({ name: '', email: '', subject: '', message: '' });
 
     } catch (err) {
+        console.error(err);
         toast.error("Failed to send message. Please try again.");
     } finally {
         setLoading(false);
@@ -55,7 +56,6 @@ const Contact = () => {
             <span className="text-palmeRed font-bold tracking-widest uppercase text-xs">Customer Support</span>
             <h1 className="text-5xl font-serif font-bold text-gray-900 leading-tight">Get in Touch</h1>
             <p className="text-gray-500 text-lg">Have questions about bulk orders or delivery? Send us a message and our team will get back to you within 24 hours.</p>
-            
             
             <div className="space-y-6 pt-6 mb-10">
               <div className="flex items-center gap-6 group">
@@ -89,11 +89,10 @@ const Contact = () => {
               </div>
             </div>
 
-            
             <div className="w-full h-64 rounded-3xl overflow-hidden shadow-lg border border-gray-100">
                 <iframe 
                     title="Palme Foods Location"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.329712345678!2d3.9!3d7.4!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwMjQnMDAuMCJOIDPCsDU0JzAwLjAiRQ!5e0!3m2!1sen!2sng!4v1600000000000!5m2!1sen!2sng" 
+                    src="https://maps.google.com/maps?q=Ibadan,%20Nigeria&t=&z=13&ie=UTF8&iwloc=&output=embed" 
                     width="100%" 
                     height="100%" 
                     style={{ border: 0 }} 
@@ -101,7 +100,6 @@ const Contact = () => {
                     loading="lazy"
                 ></iframe>
             </div>
-
           </div>
 
           
@@ -129,6 +127,20 @@ const Contact = () => {
                     onChange={handleChange}
                     className="w-full p-4 rounded-xl border border-gray-200 focus:border-palmeGreen focus:ring-1 focus:ring-palmeGreen focus:outline-none bg-white transition-colors" 
                     placeholder="john@example.com" 
+                    required
+              />
+            </div>
+
+            
+            <div>
+              <label className="text-xs font-bold uppercase text-gray-500 mb-2 block">Subject</label>
+              <input 
+                    type="text" 
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    className="w-full p-4 rounded-xl border border-gray-200 focus:border-palmeGreen focus:ring-1 focus:ring-palmeGreen focus:outline-none bg-white transition-colors" 
+                    placeholder="Inquiry about..." 
                     required
               />
             </div>
