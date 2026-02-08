@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, ArrowRight, Star, Search, Filter, Plus, Minus, Trash2 } from 'lucide-react';
+import { ShoppingCart, ArrowRight, Star, Search, Filter, Plus, Minus, Trash2, Eye, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 const ProductShowcase = ({ limit }) => {
@@ -13,9 +13,11 @@ const ProductShowcase = ({ limit }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest'); 
 
+ 
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
   const { addToCart, decreaseQty, cartItems } = useCart();
 
-  // Helper to safely get price number
   const getPrice = (p) => {
       if (!p.price) return 0;
       return parseFloat(p.price.toString().replace(/,/g, ''));
@@ -42,7 +44,6 @@ const ProductShowcase = ({ limit }) => {
         result = result.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
     }
 
-    // SAFE SORT LOGIC
     if (sortBy === 'low-high') {
         result.sort((a, b) => getPrice(a) - getPrice(b));
     } else if (sortBy === 'high-low') {
@@ -58,7 +59,8 @@ const ProductShowcase = ({ limit }) => {
   const getCartItem = (id) => cartItems.find(item => item._id === id);
 
   return (
-    <section className="py-24 px-6 max-w-7xl mx-auto">
+    <section className="py-24 px-6 max-w-7xl mx-auto relative">
+       
        
        <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
            <div className="animate-fade-in-up">
@@ -80,6 +82,7 @@ const ProductShowcase = ({ limit }) => {
            )}
        </div>
 
+       
        {!limit && (
          <div className="mb-10 flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex-1 relative">
@@ -108,6 +111,7 @@ const ProductShowcase = ({ limit }) => {
          </div>
        )}
 
+       
        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {displayedProducts.length === 0 ? (
               <div className="col-span-full text-center py-20 text-gray-400">
@@ -130,10 +134,23 @@ const ProductShowcase = ({ limit }) => {
                           alt={product.name} 
                           className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500"
                         />
-                        <div className="absolute top-4 left-4">
-                            {product.stock < 20 && <span className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">Low Stock</span>}
+                        
+                        
+                        <div className="absolute top-4 left-4 flex flex-col gap-2">
+                            {product.stock < 20 && <span className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-md">Low Stock</span>}
+                            {product.category && <span className="bg-white/80 backdrop-blur text-gray-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-sm">{product.category}</span>}
                         </div>
 
+                        
+                        <button 
+                            onClick={() => setSelectedProduct(product)}
+                            className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md text-gray-400 hover:text-palmeGreen hover:scale-110 transition-all z-20"
+                            title="View Details"
+                        >
+                            <Eye size={18} />
+                        </button>
+
+                        
                         <div className="absolute inset-x-4 bottom-4 translate-y-20 group-hover:translate-y-0 transition-transform duration-300 z-10">
                            {cartItem ? (
                                <div className="w-full bg-palmeGreen text-white font-bold py-2 rounded-xl shadow-lg flex items-center justify-between px-4">
@@ -158,13 +175,18 @@ const ProductShowcase = ({ limit }) => {
 
                     <div className="p-6 flex flex-col flex-grow">
                         <div className="flex justify-between items-start mb-2">
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{product.category}</p>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{product.size}</p>
                             <div className="flex gap-0.5 text-palmeGold">
                                 {[1,2,3,4,5].map(s => <Star key={s} size={10} fill="currentColor" />)}
                             </div>
                         </div>
-                        <h3 className="font-bold text-gray-900 text-lg mb-1 group-hover:text-palmeGreen transition-colors">{product.name}</h3>
-                        <p className="text-gray-500 text-sm mb-4">{product.size}</p>
+                        <h3 className="font-bold text-gray-900 text-lg mb-1 group-hover:text-palmeGreen transition-colors line-clamp-1">{product.name}</h3>
+                        
+                        
+                        <p className="text-gray-500 text-xs mb-4 line-clamp-2 h-8">
+                            {product.description || "Premium quality palm oil sourced directly from the farm."}
+                        </p>
+
                         <div className="mt-auto flex justify-between items-center border-t border-gray-50 pt-4">
                             <span className="font-serif font-bold text-2xl text-gray-900">₦{Number(product.price).toLocaleString()}</span>
                             {cartItem && <span className="text-xs font-bold text-palmeGreen bg-green-50 px-2 py-1 rounded-lg">{cartItem.qty} in cart</span>}
@@ -183,6 +205,73 @@ const ProductShowcase = ({ limit }) => {
                </Link>
            </div>
        )}
+
+       
+       <AnimatePresence>
+            {selectedProduct && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <motion.div 
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        onClick={() => setSelectedProduct(null)}
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                    ></motion.div>
+                    
+                    <motion.div 
+                        initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+                        className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl relative overflow-hidden z-10 flex flex-col md:flex-row"
+                    >
+                        <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-4 bg-gray-100 p-2 rounded-full hover:bg-gray-200 z-20">
+                            <X size={20} />
+                        </button>
+
+                        
+                        <div className="w-full md:w-1/2 bg-[#F3F5F7] p-8 flex items-center justify-center">
+                            <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-auto object-contain max-h-[300px]" />
+                        </div>
+
+                        
+                        <div className="w-full md:w-1/2 p-8 flex flex-col">
+                            <span className="text-palmeGreen text-xs font-bold uppercase tracking-widest mb-2">{selectedProduct.category}</span>
+                            <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">{selectedProduct.name}</h2>
+                            <p className="text-xl font-bold text-gray-900 mb-4">₦{Number(selectedProduct.price).toLocaleString()}</p>
+                            
+                            <div className="space-y-4 mb-8 flex-1">
+                                <div>
+                                    <p className="text-xs font-bold text-gray-400 uppercase">Description</p>
+                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                        {selectedProduct.description || "Experience the richness of authentic Nigerian palm oil. Unrefined, nutrient-rich, and perfect for traditional dishes."}
+                                    </p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-400 uppercase">Weight</p>
+                                        <p className="font-bold text-gray-800">{selectedProduct.weightKg ? `${selectedProduct.weightKg} kg` : 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-400 uppercase">Size</p>
+                                        <p className="font-bold text-gray-800">{selectedProduct.size || 'Standard'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-gray-400 uppercase">Stock</p>
+                                        <p className={`font-bold ${selectedProduct.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                            {selectedProduct.stock > 0 ? `${selectedProduct.stock} units` : 'Out of Stock'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button 
+                                onClick={() => { addToCart(selectedProduct); toast.success(`Added ${selectedProduct.name}`); setSelectedProduct(null); }}
+                                className="w-full bg-palmeGreen text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-800 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <ShoppingCart size={20} /> Add to Cart
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+       </AnimatePresence>
+
     </section>
   );
 };
