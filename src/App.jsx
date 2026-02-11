@@ -28,7 +28,13 @@ import Dashboard from './components/Dashboard';
 import ResetPassword from './components/ResetPassword'; 
 import ScrollToTop from './components/ScrollToTop';
 
+
+import ShippingPolicy from './components/ShippingPolicy';
+import ReturnsPolicy from './components/ReturnsPolicy';
+import TermsOfService from './components/TermsOfService';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 
 const LandingPage = () => (
   <>
@@ -92,23 +98,24 @@ const FAQPage = () => (
     </>
 );
 
+
 function App() {
   const [loading, setLoading] = useState(true);
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
 
   useEffect(() => {
+    
     const initializeApp = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/settings`);
-        if (res.data?.maintenance_mode === true) {
-           setIsMaintenanceMode(true);
-        }
+        
+        
+        
       } catch (error) {
         console.error("Failed to check settings", error);
       } finally {
         setTimeout(() => {
           setLoading(false);
-        }, 2500);
+        }, 2000); 
       }
     };
     initializeApp();
@@ -129,31 +136,40 @@ function App() {
           <div className="font-sans antialiased text-gray-900 bg-white relative">
             
             <Routes>
-              
+             
               <Route path="/" element={<LandingPage />} />
               <Route path="/shop" element={<ShopPage />} />
               <Route path="/about" element={<AboutPage />} /> 
-              
               <Route path="/testimonials" element={<TestimonialsPage />} />
-              
-              <Route path="/custom-orders" element={<BulkOrder />} />
               <Route path="/faq" element={<FAQPage />} />
               
+             
+              <Route path="/custom-orders" element={<BulkOrder />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/contact" element={<Contact />} />
               
+             
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-success" element={<OrderSuccess />} />
               
+             
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
               
+             
+              <Route path="/shipping-policy" element={<ShippingPolicy />} />
+              <Route path="/returns" element={<ReturnsPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+
+             
               <Route path="*" element={<NotFound />} />
             </Routes>
             
+           
             <CartDrawer />
             <AuthModal /> 
             <WhatsAppButton />
+
           </div>
         </Router>
       </CartProvider>

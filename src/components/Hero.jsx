@@ -82,7 +82,7 @@ const Hero = () => {
           </h1>
           
           <p className="text-base md:text-lg text-gray-600 max-w-lg leading-relaxed font-light">
-            Experience the rich taste of unadulterated palm oil. 100% Organic, filtered, and sourced directly for the PalmeFoods Store.
+            Experience the depth, richness, and authenticity of premium palm oil sourced directly from trusted Nigerian farms. Naturally organic, carefully filtered, and crafted for both everyday meals and refined cooking.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-2 w-full sm:w-auto justify-center lg:justify-start">

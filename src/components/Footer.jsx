@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebookF, faInstagram, faWhatsapp, faTiktok, faXTwitter } from '@fortawesome/free-brands-svg-icons'; 
+
+import { faFacebookF, faInstagram, faWhatsapp, faTiktok, faXTwitter, faLinkedin, faYoutube } from '@fortawesome/free-brands-svg-icons'; 
 import { MapPin, Phone, Mail, ArrowRight, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import logo from '../assets/logo.png';
@@ -45,13 +46,14 @@ const Footer = () => {
           <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
             Bringing the authentic taste of Nigerian palm oil to the global kitchen. Pure, unadulterated, and sustainably sourced from the heart of Osun State.
           </p>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <SocialIcon icon={faWhatsapp} link="https://wa.me/2349134033103" color="hover:bg-[#25D366]" />
-            <SocialIcon icon={faInstagram} link="https://instagram.com" color="hover:bg-[#E1306C]" />
-            <SocialIcon icon={faFacebookF} link="https://facebook.com" color="hover:bg-[#1877F2]" />
-            {/* ✅ Replaced faTwitter with faXTwitter */}
-            <SocialIcon icon={faXTwitter} link="https://twitter.com" color="hover:bg-black" />
-            <SocialIcon icon={faTiktok} link="https://tiktok.com" color="hover:bg-black" />
+            <SocialIcon icon={faInstagram} link="https://www.instagram.com/palmefoods" color="hover:bg-[#E1306C]" />
+            <SocialIcon icon={faFacebookF} link="https://www.facebook.com/palmefoods/" color="hover:bg-[#1877F2]" />
+            <SocialIcon icon={faXTwitter} link="https://x.com/palmefoods" color="hover:bg-black" />
+            <SocialIcon icon={faLinkedin} link="https://www.linkedin.com/company/palmefoods/" color="hover:bg-[#0077b5]" />
+            <SocialIcon icon={faYoutube} link="https://youtube.com/@palmefoods" color="hover:bg-[#FF0000]" />
+            <SocialIcon icon={faTiktok} link="https://www.tiktok.com/@palmefoods" color="hover:bg-black" />
           </div>
         </div>
 

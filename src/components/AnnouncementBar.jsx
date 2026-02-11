@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebookF, faInstagram, faWhatsapp, faTiktok, faXTwitter } from '@fortawesome/free-brands-svg-icons'; // ✅ Added faXTwitter
+import { faFacebookF, faInstagram, faWhatsapp, faTiktok, faXTwitter, faLinkedin, faYoutube } from '@fortawesome/free-brands-svg-icons'; 
 import { faPhone, faEnvelope, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -65,10 +65,11 @@ const AnnouncementBar = () => {
 
               <div className="flex items-center gap-3 md:gap-4 shrink-0">
                 <div className="flex gap-3 items-center border-r border-white/20 pr-3 md:pr-4">
-                  <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faFacebookF} /></a>
-                  <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faInstagram} /></a>
-                  
-                  <a href="#" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faXTwitter} /></a>
+                  <a href="https://www.facebook.com/palmefoods/" target="_blank" rel="noreferrer" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faFacebookF} /></a>
+                  <a href="https://www.instagram.com/palmefoods" target="_blank" rel="noreferrer" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faInstagram} /></a>
+                  <a href="https://x.com/palmefoods" target="_blank" rel="noreferrer" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faXTwitter} /></a>
+                  <a href="https://www.linkedin.com/company/palmefoods/" target="_blank" rel="noreferrer" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faLinkedin} /></a>
+                  <a href="https://youtube.com/@palmefoods" target="_blank" rel="noreferrer" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faYoutube} /></a>
                   <a href="https://www.tiktok.com/@palmefoods" target="_blank" rel="noreferrer" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faTiktok} /></a>
                   <a href="https://wa.me/2349134033103" target="_blank" rel="noreferrer" className="hover:text-green-200 transition-colors"><FontAwesomeIcon icon={faWhatsapp} size="lg" /></a>
                 </div>
