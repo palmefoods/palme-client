@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios'; 
+import { HelmetProvider } from 'react-helmet-async';
+import SEO from './components/SEO';
+
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext'; 
 import Navbar from './components/Navbar';
@@ -28,16 +31,18 @@ import Dashboard from './components/Dashboard';
 import ResetPassword from './components/ResetPassword'; 
 import ScrollToTop from './components/ScrollToTop';
 
-
 import ShippingPolicy from './components/ShippingPolicy';
 import ReturnsPolicy from './components/ReturnsPolicy';
 import TermsOfService from './components/TermsOfService';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-
 const LandingPage = () => (
   <>
+    <SEO 
+      title="Pure Nigerian Palm Oil | Direct from Farm" 
+      description="Taste the difference with PalmeFoods. Premium, unadulterated palm oil sourced from Osun State. Nationwide delivery for homes and businesses."
+    />
     <AnnouncementBar />
     <Navbar />
     <Hero />
@@ -52,6 +57,10 @@ const LandingPage = () => (
 
 const ShopPage = () => (
   <>
+    <SEO 
+      title="Shop All Products | 5L, 10L, 25L Kegs" 
+      description="Buy premium Nigerian Palm Oil online. Available in various sizes. Fresh, unadulterated, and delivered straight to your doorstep."
+    />
     <AnnouncementBar />
     <Navbar />
     <div className="pt-20">
@@ -67,6 +76,10 @@ const ShopPage = () => (
 
 const AboutPage = () => (
   <>
+    <SEO 
+      title="Our Story & Heritage" 
+      description="We bridge the gap between rural palm farmers in Osun State and your modern kitchen. Learn about our mission for purity and sustainability."
+    />
     <AnnouncementBar />
     <Navbar />
     <div className="pt-20">
@@ -78,6 +91,7 @@ const AboutPage = () => (
 
 const TestimonialsPage = () => (
     <>
+      <SEO title="Customer Reviews" description="See what our happy customers are saying about PalmeFoods premium palm oil." />
       <AnnouncementBar />
       <Navbar />
       <div className="pt-20">
@@ -89,6 +103,7 @@ const TestimonialsPage = () => (
 
 const FAQPage = () => (
     <>
+      <SEO title="Frequently Asked Questions" description="Have questions about delivery, purity, or bulk orders? Find all your answers here." />
       <AnnouncementBar />
       <Navbar />
       <div className="pt-20">
@@ -98,18 +113,14 @@ const FAQPage = () => (
     </>
 );
 
-
 function App() {
   const [loading, setLoading] = useState(true);
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
 
   useEffect(() => {
-    
     const initializeApp = async () => {
       try {
-        
-        
-        
+        // Optional: Check settings logic
       } catch (error) {
         console.error("Failed to check settings", error);
       } finally {
@@ -125,55 +136,76 @@ function App() {
   if (isMaintenanceMode) return <Maintenance />;
 
   return (
-    <AuthProvider> 
-      <CartProvider>
-        <Router>
-          
-          <ScrollToTop />
-          
-          <Toaster position="top-center" reverseOrder={false} />
-          
-          <div className="font-sans antialiased text-gray-900 bg-white relative">
+    <HelmetProvider> 
+      <AuthProvider> 
+        <CartProvider>
+          <Router>
             
-            <Routes>
-             
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/shop" element={<ShopPage />} />
-              <Route path="/about" element={<AboutPage />} /> 
-              <Route path="/testimonials" element={<TestimonialsPage />} />
-              <Route path="/faq" element={<FAQPage />} />
-              
-             
-              <Route path="/custom-orders" element={<BulkOrder />} />
-              <Route path="/gallery" element={<Gallery />} />
-              <Route path="/contact" element={<Contact />} />
-              
-             
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/order-success" element={<OrderSuccess />} />
-              
-             
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
-              
-             
-              <Route path="/shipping-policy" element={<ShippingPolicy />} />
-              <Route path="/returns" element={<ReturnsPolicy />} />
-              <Route path="/terms" element={<TermsOfService />} />
-
-             
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <ScrollToTop />
+            <Toaster position="top-center" reverseOrder={false} />
             
-           
-            <CartDrawer />
-            <AuthModal /> 
-            <WhatsAppButton />
+            <div className="font-sans antialiased text-gray-900 bg-white relative">
+              
+              <Routes>
+                
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/shop" element={<ShopPage />} />
+                <Route path="/about" element={<AboutPage />} /> 
+                <Route path="/testimonials" element={<TestimonialsPage />} />
+                <Route path="/faq" element={<FAQPage />} />
+                
+                
+                <Route 
+                    path="/custom-orders" 
+                    element={<><SEO title="Bulk & Wholesale Orders" description="Get wholesale pricing for restaurants, hotels, and industrial needs." /><BulkOrder /></>} 
+                />
+                <Route 
+                    path="/gallery" 
+                    element={<><SEO title="Gallery | Our Process" /><Gallery /></>} 
+                />
+                <Route 
+                    path="/contact" 
+                    element={<><SEO title="Contact Us" description="Get in touch with PalmeFoods. Call us or visit our HQ in Ibadan." /><Contact /></>} 
+                />
+                
+                <Route 
+                    path="/checkout" 
+                    element={<><SEO title="Secure Checkout" /><Checkout /></>} 
+                />
+                <Route path="/order-success" element={<OrderSuccess />} />
+                
+                <Route 
+                    path="/dashboard" 
+                    element={<><SEO title="My Dashboard" /><Dashboard /></>} 
+                />
+                <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
+                
+                
+                <Route 
+                    path="/shipping-policy" 
+                    element={<><SEO title="Shipping Policy" /><ShippingPolicy /></>} 
+                />
+                <Route 
+                    path="/returns" 
+                    element={<><SEO title="Returns & Refunds" /><ReturnsPolicy /></>} 
+                />
+                <Route 
+                    path="/terms" 
+                    element={<><SEO title="Terms of Service" /><TermsOfService /></>} 
+                />
 
-          </div>
-        </Router>
-      </CartProvider>
-    </AuthProvider>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              
+              <CartDrawer />
+              <AuthModal /> 
+              <WhatsAppButton />
+
+            </div>
+          </Router>
+        </CartProvider>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

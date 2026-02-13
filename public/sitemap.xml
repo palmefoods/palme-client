@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+      <loc>https://palmefoods.com/</loc>
+      <lastmod>2026-02-13</lastmod>
+      <priority>1.00</priority>
+   </url>
+   <url>
+      <loc>https://palmefoods.com/shop</loc>
+      <priority>0.90</priority>
+   </url>
+   <url>
+      <loc>https://palmefoods.com/about</loc>
+      <priority>0.80</priority>
+   </url>
+   <url>
+      <loc>https://palmefoods.com/custom-orders</loc>
+      <priority>0.80</priority>
+   </url>
+   <url>
+      <loc>https://palmefoods.com/contact</loc>
+      <priority>0.70</priority>
+   </url>
+   <url>
+      <loc>https://palmefoods.com/faq</loc>
+      <priority>0.60</priority>
+   </url>
+</urlset>
