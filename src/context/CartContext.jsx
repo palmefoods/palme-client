@@ -11,7 +11,6 @@ export const CartProvider = ({ children }) => {
   const [deliveryType, setDeliveryType] = useState('doorstep'); 
   const [selectedLocation, setSelectedLocation] = useState(null); 
 
-  
   useEffect(() => {
     const savedCart = localStorage.getItem('palme_cart');
     if (savedCart) {
@@ -19,7 +18,6 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
-  
   useEffect(() => {
     localStorage.setItem('palme_cart', JSON.stringify(cartItems));
   }, [cartItems]);
@@ -34,7 +32,6 @@ export const CartProvider = ({ children }) => {
       }
       return [...prev, { ...product, qty: 1 }];
     });
-    
   };
 
   const decreaseQty = (id) => {
@@ -58,8 +55,12 @@ export const CartProvider = ({ children }) => {
       localStorage.removeItem('palme_cart');
   };
 
-  const cartTotal = cartItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
-  
+ 
+  const cartTotal = cartItems.reduce((acc, item) => {
+   
+    const activePrice = (item.isWholesale && item.qty >= item.moq) ? item.wholesalePrice : item.price;
+    return acc + (activePrice * item.qty);
+  }, 0);
   
   const totalWeight = cartItems.reduce((acc, item) => acc + ((item.weightKg || 1) * item.qty), 0);
 

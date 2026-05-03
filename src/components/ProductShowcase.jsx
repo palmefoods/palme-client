@@ -13,7 +13,6 @@ const ProductShowcase = ({ limit }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest'); 
 
- 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const { addToCart, decreaseQty, cartItems } = useCart();
@@ -61,7 +60,6 @@ const ProductShowcase = ({ limit }) => {
   return (
     <section className="py-24 px-6 max-w-7xl mx-auto relative">
        
-       
        <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
            <div className="animate-fade-in-up">
                <span className="text-palmeGreen font-bold tracking-widest uppercase text-xs bg-green-50 px-3 py-1 rounded-full border border-green-100">
@@ -82,7 +80,6 @@ const ProductShowcase = ({ limit }) => {
            )}
        </div>
 
-       
        {!limit && (
          <div className="mb-10 flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex-1 relative">
@@ -111,7 +108,6 @@ const ProductShowcase = ({ limit }) => {
          </div>
        )}
 
-       
        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {displayedProducts.length === 0 ? (
               <div className="col-span-full text-center py-20 text-gray-400">
@@ -135,13 +131,11 @@ const ProductShowcase = ({ limit }) => {
                           className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500"
                         />
                         
-                        
                         <div className="absolute top-4 left-4 flex flex-col gap-2">
                             {product.stock < 20 && <span className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-md">Low Stock</span>}
                             {product.category && <span className="bg-white/80 backdrop-blur text-gray-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-sm">{product.category}</span>}
                         </div>
 
-                        
                         <button 
                             onClick={() => setSelectedProduct(product)}
                             className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md text-gray-400 hover:text-palmeGreen hover:scale-110 transition-all z-20"
@@ -150,7 +144,6 @@ const ProductShowcase = ({ limit }) => {
                             <Eye size={18} />
                         </button>
 
-                        
                         <div className="absolute inset-x-4 bottom-4 translate-y-20 group-hover:translate-y-0 transition-transform duration-300 z-10">
                            {cartItem ? (
                                <div className="w-full bg-palmeGreen text-white font-bold py-2 rounded-xl shadow-lg flex items-center justify-between px-4">
@@ -182,13 +175,18 @@ const ProductShowcase = ({ limit }) => {
                         </div>
                         <h3 className="font-bold text-gray-900 text-lg mb-1 group-hover:text-palmeGreen transition-colors line-clamp-1">{product.name}</h3>
                         
-                        
                         <p className="text-gray-500 text-xs mb-4 line-clamp-2 h-8">
                             {product.description || "Premium quality palm oil sourced directly from the farm."}
                         </p>
 
-                        <div className="mt-auto flex justify-between items-center border-t border-gray-50 pt-4">
-                            <span className="font-serif font-bold text-2xl text-gray-900">₦{Number(product.price).toLocaleString()}</span>
+                        <div className="mt-auto flex justify-between items-end border-t border-gray-50 pt-4">
+                            <div>
+                                <span className="font-serif font-bold text-2xl text-gray-900">₦{Number(product.price).toLocaleString()}</span>
+                                {/* 🚀 SHOW WHOLESALE BADGE */}
+                                {product.isWholesale && product.moq > 0 && (
+                                    <p className="text-[10px] text-palmeGreen font-bold tracking-wide mt-1">Wholesale: ₦{Number(product.wholesalePrice).toLocaleString()} (Min {product.moq})</p>
+                                )}
+                            </div>
                             {cartItem && <span className="text-xs font-bold text-palmeGreen bg-green-50 px-2 py-1 rounded-lg">{cartItem.qty} in cart</span>}
                         </div>
                     </div>
@@ -206,7 +204,6 @@ const ProductShowcase = ({ limit }) => {
            </div>
        )}
 
-       
        <AnimatePresence>
             {selectedProduct && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -224,18 +221,23 @@ const ProductShowcase = ({ limit }) => {
                             <X size={20} />
                         </button>
 
-                        
                         <div className="w-full md:w-1/2 bg-[#F3F5F7] p-8 flex items-center justify-center">
                             <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-auto object-contain max-h-[300px]" />
                         </div>
 
-                        
                         <div className="w-full md:w-1/2 p-8 flex flex-col">
                             <span className="text-palmeGreen text-xs font-bold uppercase tracking-widest mb-2">{selectedProduct.category}</span>
                             <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">{selectedProduct.name}</h2>
-                            <p className="text-xl font-bold text-gray-900 mb-4">₦{Number(selectedProduct.price).toLocaleString()}</p>
                             
-                            <div className="space-y-4 mb-8 flex-1">
+                            <p className="text-xl font-bold text-gray-900 mb-1">₦{Number(selectedProduct.price).toLocaleString()}</p>
+                            {/* 🚀 QUICKVIEW MODAL WHOLESALE CALLOUT */}
+                            {selectedProduct.isWholesale && selectedProduct.moq > 0 && (
+                                <p className="text-xs text-palmeGreen font-bold mb-4 bg-green-50 inline-block px-2 py-1 rounded">
+                                    Wholesale: ₦{Number(selectedProduct.wholesalePrice).toLocaleString()} / unit (Min {selectedProduct.moq})
+                                </p>
+                            )}
+                            
+                            <div className="space-y-4 mb-8 mt-2 flex-1">
                                 <div>
                                     <p className="text-xs font-bold text-gray-400 uppercase">Description</p>
                                     <p className="text-gray-600 text-sm leading-relaxed">

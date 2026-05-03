@@ -29,7 +29,6 @@ const CartDrawer = () => {
 
       <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[70] shadow-2xl flex flex-col transform transition-transform duration-300">
         
-        {/* Header */}
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
           <div className="flex items-center gap-2">
             <ShoppingBag className="text-palmeGreen" />
@@ -40,7 +39,6 @@ const CartDrawer = () => {
           </button>
         </div>
 
-        {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {cartItems.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
@@ -56,7 +54,12 @@ const CartDrawer = () => {
               </button>
             </div>
           ) : (
-            cartItems.map((item) => (
+            cartItems.map((item) => {
+             
+              const isWholesaleActive = item.isWholesale && item.qty >= item.moq;
+              const activePrice = isWholesaleActive ? item.wholesalePrice : item.price;
+
+              return (
               <div key={item._id} className="flex gap-4 animate-fade-in">
                 <div className="w-24 h-24 bg-gray-50 rounded-xl flex-shrink-0 border border-gray-100 p-2">
                   <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
@@ -74,9 +77,12 @@ const CartDrawer = () => {
                   </div>
                   
                   <div className="flex justify-between items-end">
-                    <span className="font-bold text-palmeGreen">₦{Number(item.price).toLocaleString()}</span>
+                    {/* 🚀 DISPLAY ACTIVE PRICE AND BADGE */}
+                    <div className="flex flex-col">
+                        <span className="font-bold text-palmeGreen">₦{Number(activePrice).toLocaleString()}</span>
+                        {isWholesaleActive && <span className="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded mt-0.5 uppercase tracking-wider">Wholesale</span>}
+                    </div>
                     
-                    {/* QTY CONTROLS */}
                     <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-1 border border-gray-100">
                       <button 
                         onClick={() => decreaseQty(item._id)}
@@ -95,15 +101,12 @@ const CartDrawer = () => {
                   </div>
                 </div>
               </div>
-            ))
+            )})
           )}
         </div>
 
-        {/* Footer / Summary */}
         {cartItems.length > 0 && (
           <div className="p-6 bg-gray-50 border-t border-gray-100">
-            
-            {/* Delivery Toggle in Drawer */}
             <div className="mb-6 bg-white p-1 rounded-xl border border-gray-200 flex">
                <button 
                   onClick={() => setDeliveryType('doorstep')}
