@@ -84,15 +84,14 @@ const Checkout = () => {
     
     
     let shippingFee = 0;
-    if (deliveryType === 'doorstep') {
-        shippingFee = getNumericPrice(settings.doorstep_price);
-    } else if (deliveryType === 'park') {
+    
+    if (deliveryType === 'park') {
         if (selectedLocation) {
             shippingFee = getNumericPrice(selectedLocation.basePrice || selectedLocation.price || settings.park_price);
         } else {
             shippingFee = getNumericPrice(settings.park_price);
         }
-    } else if (deliveryType === 'international') {
+    } else if (deliveryType === 'doorstep' || deliveryType === 'international') {
         shippingFee = 0; 
     }
     
@@ -291,7 +290,8 @@ const Checkout = () => {
                                 </div>
                                 <span className="text-sm font-bold text-gray-800">Doorstep Delivery</span>
                             </div>
-                            <span className="text-sm font-bold text-gray-900">₦{getNumericPrice(settings.doorstep_price).toLocaleString()}</span>
+                            {/* 🚀 UPDATED: Doorstep visual changed to Calculated Later */}
+                            <span className="text-sm font-bold text-gray-900 flex items-center gap-1">Calculated Later</span>
                         </div>
 
                         
@@ -477,8 +477,9 @@ const Checkout = () => {
                                 <span>Shipping</span>
                                 <HelpCircle size={12} className="text-gray-400" />
                             </div>
+                            {/* 🚀 UPDATED: Order summary correctly groups doorstep with international visual */}
                             <span className="font-medium text-gray-900">
-                                {deliveryType === 'international' ? 'Calculated Later' : `₦${shippingFee.toLocaleString()}`}
+                                {(deliveryType === 'international' || deliveryType === 'doorstep') ? 'Calculated Later' : `₦${shippingFee.toLocaleString()}`}
                             </span>
                         </div>
                         

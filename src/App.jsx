@@ -120,7 +120,11 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // Optional: Check settings logic
+        
+        const res = await axios.get(`${API_URL}/api/settings`);
+        if (res.data && res.data.maintenance_mode === true) {
+            setIsMaintenanceMode(true);
+        }
       } catch (error) {
         console.error("Failed to check settings", error);
       } finally {
