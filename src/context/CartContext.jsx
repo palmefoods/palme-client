@@ -30,13 +30,21 @@ export const CartProvider = ({ children }) => {
           item._id === product._id ? { ...item, qty: item.qty + 1 } : item
         );
       }
-      return [...prev, { ...product, qty: 1 }];
+      
+      const initialQty = (product.isBulkSupply && product.bulkMinQty > 0) ? product.bulkMinQty : 1;
+      return [...prev, { ...product, qty: initialQty }];
     });
   };
 
   const decreaseQty = (id) => {
     setCartItems(prev => {
         const existing = prev.find(item => item._id === id);
+        
+        
+        if (existing.isBulkSupply && existing.qty <= (existing.bulkMinQty || 1)) {
+            return prev; 
+        }
+
         if (existing.qty === 1) {
             return prev.filter(item => item._id !== id); 
         }
@@ -55,9 +63,7 @@ export const CartProvider = ({ children }) => {
       localStorage.removeItem('palme_cart');
   };
 
- 
   const cartTotal = cartItems.reduce((acc, item) => {
-   
     const activePrice = (item.isWholesale && item.qty >= item.moq) ? item.wholesalePrice : item.price;
     return acc + (activePrice * item.qty);
   }, 0);

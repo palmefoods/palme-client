@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, ArrowRight, Star, Search, Filter, Plus, Minus, Trash2, Eye, X } from 'lucide-react';
+import { ShoppingCart, ArrowRight, Star, Search, Filter, Plus, Minus, Trash2, Eye, X, Package } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -131,9 +131,15 @@ const ProductShowcase = ({ limit }) => {
                           className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500"
                         />
                         
-                        <div className="absolute top-4 left-4 flex flex-col gap-2">
+                        <div className="absolute top-4 left-4 flex flex-col gap-2 items-start">
                             {product.stock < 20 && <span className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-md">Low Stock</span>}
                             {product.category && <span className="bg-white/80 backdrop-blur text-gray-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-sm">{product.category}</span>}
+                            
+                            {product.isBulkSupply && (
+                                <span className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-md flex items-center gap-1">
+                                    <Package size={10} /> Bulk Supply
+                                </span>
+                            )}
                         </div>
 
                         <button 
@@ -148,7 +154,7 @@ const ProductShowcase = ({ limit }) => {
                            {cartItem ? (
                                <div className="w-full bg-palmeGreen text-white font-bold py-2 rounded-xl shadow-lg flex items-center justify-between px-4">
                                    <button onClick={() => decreaseQty(product._id)} className="p-1 hover:bg-green-800 rounded-full transition-colors">
-                                      {cartItem.qty === 1 ? <Trash2 size={16} /> : <Minus size={16} />}
+                                      {cartItem.qty === (product.isBulkSupply ? (product.bulkMinQty || 1) : 1) ? <Trash2 size={16} /> : <Minus size={16} />}
                                    </button>
                                    <span className="text-lg">{cartItem.qty}</span>
                                    <button onClick={() => addToCart(product)} className="p-1 hover:bg-green-800 rounded-full transition-colors">
@@ -182,8 +188,11 @@ const ProductShowcase = ({ limit }) => {
                         <div className="mt-auto flex justify-between items-end border-t border-gray-50 pt-4">
                             <div>
                                 <span className="font-serif font-bold text-2xl text-gray-900">₦{Number(product.price).toLocaleString()}</span>
-                                {/* 🚀 SHOW WHOLESALE BADGE */}
-                                {product.isWholesale && product.moq > 0 && (
+                                
+                                {product.isBulkSupply && (
+                                    <p className="text-[10px] text-blue-600 font-bold tracking-wide mt-1">Min Order: {product.bulkMinQty} {product.bulkUnitLabel}</p>
+                                )}
+                                {product.isWholesale && product.moq > 0 && !product.isBulkSupply && (
                                     <p className="text-[10px] text-palmeGreen font-bold tracking-wide mt-1">Wholesale: ₦{Number(product.wholesalePrice).toLocaleString()} (Min {product.moq})</p>
                                 )}
                             </div>
@@ -230,9 +239,15 @@ const ProductShowcase = ({ limit }) => {
                             <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">{selectedProduct.name}</h2>
                             
                             <p className="text-xl font-bold text-gray-900 mb-1">₦{Number(selectedProduct.price).toLocaleString()}</p>
-                            {/* 🚀 QUICKVIEW MODAL WHOLESALE CALLOUT */}
+                            
+                            
+                            {selectedProduct.isBulkSupply && (
+                                <p className="text-xs text-blue-600 font-bold mb-2 bg-blue-50 inline-block px-2 py-1 rounded w-max">
+                                    Bulk Exclusive: Minimum Order is {selectedProduct.bulkMinQty} {selectedProduct.bulkUnitLabel}
+                                </p>
+                            )}
                             {selectedProduct.isWholesale && selectedProduct.moq > 0 && (
-                                <p className="text-xs text-palmeGreen font-bold mb-4 bg-green-50 inline-block px-2 py-1 rounded">
+                                <p className="text-xs text-palmeGreen font-bold mb-4 bg-green-50 inline-block px-2 py-1 rounded w-max">
                                     Wholesale: ₦{Number(selectedProduct.wholesalePrice).toLocaleString()} / unit (Min {selectedProduct.moq})
                                 </p>
                             )}

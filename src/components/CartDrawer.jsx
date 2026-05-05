@@ -55,9 +55,11 @@ const CartDrawer = () => {
             </div>
           ) : (
             cartItems.map((item) => {
-             
               const isWholesaleActive = item.isWholesale && item.qty >= item.moq;
               const activePrice = isWholesaleActive ? item.wholesalePrice : item.price;
+              
+              
+              const isAtBulkMinimum = item.isBulkSupply && item.qty <= (item.bulkMinQty || 1);
 
               return (
               <div key={item._id} className="flex gap-4 animate-fade-in">
@@ -73,24 +75,31 @@ const CartDrawer = () => {
                         <Trash2 size={16} />
                       </button>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">{item.size}</p>
+                    
+                    <p className="text-sm text-gray-500 mt-1">{item.size} {item.isBulkSupply && `• ${item.bulkUnitLabel}`}</p>
                   </div>
                   
                   <div className="flex justify-between items-end">
-                    {/* 🚀 DISPLAY ACTIVE PRICE AND BADGE */}
                     <div className="flex flex-col">
                         <span className="font-bold text-palmeGreen">₦{Number(activePrice).toLocaleString()}</span>
                         {isWholesaleActive && <span className="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded mt-0.5 uppercase tracking-wider">Wholesale</span>}
+                        {isAtBulkMinimum && <span className="text-[10px] font-bold text-blue-600 mt-0.5 uppercase">Min Order Reached</span>}
                     </div>
                     
                     <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-1 border border-gray-100">
                       <button 
-                        onClick={() => decreaseQty(item._id)}
+                        onClick={() => {
+                            if (isAtBulkMinimum || item.qty === 1) {
+                                removeFromCart(item._id); 
+                            } else {
+                                decreaseQty(item._id);
+                            }
+                        }}
                         className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-600 hover:text-palmeGreen transition-colors"
                       >
-                        <Minus size={14} />
+                        {isAtBulkMinimum || item.qty === 1 ? <Trash2 size={14} className="text-red-400" /> : <Minus size={14} />}
                       </button>
-                      <span className="text-sm font-bold w-4 text-center">{item.qty}</span>
+                      <span className="text-sm font-bold min-w-[1.5rem] text-center">{item.qty}</span>
                       <button 
                         onClick={() => addToCart(item)}
                         className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-600 hover:text-palmeGreen transition-colors"
