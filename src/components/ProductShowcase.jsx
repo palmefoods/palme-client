@@ -58,7 +58,7 @@ const ProductShowcase = ({ limit }) => {
   const getCartItem = (id) => cartItems.find(item => item._id === id);
 
   return (
-    <section className="py-24 px-6 max-w-7xl mx-auto relative">
+    <section className="py-24 px-4 sm:px-6 max-w-7xl mx-auto relative">
        
        <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
            <div className="animate-fade-in-up">
@@ -108,7 +108,8 @@ const ProductShowcase = ({ limit }) => {
          </div>
        )}
 
-       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+       
+       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
           {displayedProducts.length === 0 ? (
               <div className="col-span-full text-center py-20 text-gray-400">
                   <p>No products found.</p>
@@ -116,8 +117,7 @@ const ProductShowcase = ({ limit }) => {
           ) : (
             displayedProducts.map((product, index) => {
                 const cartItem = getCartItem(product._id);
-                
-                const minRequired = product.isBulkSupply ? (product.bulkMinQty || 1) * (product.itemsPerBulkUnit || 1) : 1;
+                const minRequired = product.isBulkSupply ? (product.bulkMinQty || 1) : 1;
 
                 return (
                 <motion.div 
@@ -125,38 +125,38 @@ const ProductShowcase = ({ limit }) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.05 }}
-                    className="group relative bg-white rounded-3xl border border-gray-100 hover:border-palmeGreen/30 hover:shadow-2xl hover:shadow-green-900/5 transition-all duration-300 flex flex-col overflow-hidden"
+                    className="group relative bg-white rounded-2xl sm:rounded-3xl border border-gray-100 hover:border-palmeGreen/30 hover:shadow-2xl hover:shadow-green-900/5 transition-all duration-300 flex flex-col overflow-hidden"
                 >
-                    <div className="h-72 bg-[#F3F5F7] relative overflow-hidden">
+                    <div className="h-48 sm:h-72 bg-[#F3F5F7] relative overflow-hidden">
                         <img 
                           src={product.image} 
                           alt={product.name} 
-                          className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500"
+                          className="w-full h-full object-contain p-4 sm:p-6 group-hover:scale-110 transition-transform duration-500"
                         />
                         
-                        <div className="absolute top-4 left-4 flex flex-col gap-2 items-start">
-                            {product.stock < 20 && <span className="bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-md">Low Stock</span>}
-                            {product.category && <span className="bg-white/80 backdrop-blur text-gray-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-sm">{product.category}</span>}
+                        <div className="absolute top-2 left-2 sm:top-4 sm:left-4 flex flex-col gap-1 sm:gap-2 items-start">
+                            {product.stock < 20 && <span className="bg-red-500 text-white text-[8px] sm:text-[10px] font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase shadow-md">Low Stock</span>}
+                            {product.category && <span className="bg-white/80 backdrop-blur text-gray-700 text-[8px] sm:text-[10px] font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase shadow-sm">{product.category}</span>}
+                            
                             {product.isBulkSupply && (
-                                <span className="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase shadow-md flex items-center gap-1">
-                                    <Package size={10} /> Bulk Supply
+                                <span className="bg-blue-600 text-white text-[8px] sm:text-[10px] font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase shadow-md flex items-center gap-1">
+                                    <Package size={10} /> Wholesale
                                 </span>
                             )}
                         </div>
 
                         <button 
                             onClick={() => setSelectedProduct(product)}
-                            className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md text-gray-400 hover:text-palmeGreen hover:scale-110 transition-all z-20"
+                            className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white p-1.5 sm:p-2 rounded-full shadow-md text-gray-400 hover:text-palmeGreen hover:scale-110 transition-all z-20"
                             title="View Details"
                         >
-                            <Eye size={18} />
+                            <Eye size={16} className="sm:w-[18px] sm:h-[18px]" />
                         </button>
 
-                        <div className="absolute inset-x-4 bottom-4 translate-y-20 group-hover:translate-y-0 transition-transform duration-300 z-10">
+                        <div className="absolute inset-x-2 sm:inset-x-4 bottom-2 sm:bottom-4 translate-y-20 group-hover:translate-y-0 transition-transform duration-300 z-10 hidden sm:block">
                            {cartItem ? (
                                <div className="w-full bg-palmeGreen text-white font-bold py-2 rounded-xl shadow-lg flex items-center justify-between px-4">
                                    <button onClick={() => decreaseQty(product._id)} className="p-1 hover:bg-green-800 rounded-full transition-colors">
-                                      
                                       {cartItem.qty === minRequired ? <Trash2 size={16} /> : <Minus size={16} />}
                                    </button>
                                    <span className="text-lg">{cartItem.qty}</span>
@@ -175,34 +175,50 @@ const ProductShowcase = ({ limit }) => {
                         </div>
                     </div>
 
-                    <div className="p-6 flex flex-col flex-grow">
-                        <div className="flex justify-between items-start mb-2">
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{product.size}</p>
-                            <div className="flex gap-0.5 text-palmeGold">
+                    <div className="p-3 sm:p-6 flex flex-col flex-grow">
+                        <div className="flex justify-between items-start mb-1 sm:mb-2">
+                            <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">{product.size}</p>
+                            <div className="flex gap-0.5 text-palmeGold hidden sm:flex">
                                 {[1,2,3,4,5].map(s => <Star key={s} size={10} fill="currentColor" />)}
                             </div>
                         </div>
-                        <h3 className="font-bold text-gray-900 text-lg mb-1 group-hover:text-palmeGreen transition-colors line-clamp-1">{product.name}</h3>
+                        <h3 className="font-bold text-gray-900 text-sm sm:text-lg mb-1 group-hover:text-palmeGreen transition-colors line-clamp-2 sm:line-clamp-1">{product.name}</h3>
                         
-                        <p className="text-gray-500 text-xs mb-4 line-clamp-2 h-8">
-                            {product.description || "Premium quality palm oil sourced directly from the farm."}
-                        </p>
-
-                        <div className="mt-auto flex justify-between items-end border-t border-gray-50 pt-4">
+                        <div className="mt-auto flex flex-col sm:flex-row sm:justify-between sm:items-end border-t border-gray-50 pt-2 sm:pt-4">
                             <div>
-                                <span className="font-serif font-bold text-2xl text-gray-900">₦{Number(product.price).toLocaleString()}</span>
+                                <span className="font-serif font-bold text-lg sm:text-2xl text-gray-900">₦{Number(product.price).toLocaleString()}</span>
                                 
                                 
                                 {product.isBulkSupply && (
-                                    <p className="text-[10px] text-blue-600 font-bold tracking-wide mt-1">
-                                        Min: {product.bulkMinQty} {product.bulkUnitLabel}{product.bulkMinQty > 1 ? 's' : ''} ({minRequired} units)
+                                    <p className="text-[8px] sm:text-[10px] text-blue-600 font-bold tracking-wide mt-0.5 sm:mt-1">
+                                        Min Order: {product.bulkMinQty} {product.bulkUnitLabel}{product.bulkMinQty > 1 ? 's' : ''}
                                     </p>
                                 )}
                                 {product.isWholesale && product.moq > 0 && !product.isBulkSupply && (
-                                    <p className="text-[10px] text-palmeGreen font-bold tracking-wide mt-1">Wholesale: ₦{Number(product.wholesalePrice).toLocaleString()} (Min {product.moq})</p>
+                                    <p className="text-[8px] sm:text-[10px] text-palmeGreen font-bold tracking-wide mt-0.5 sm:mt-1">Wholesale: ₦{Number(product.wholesalePrice).toLocaleString()} (Min {product.moq})</p>
                                 )}
                             </div>
-                            {cartItem && <span className="text-xs font-bold text-palmeGreen bg-green-50 px-2 py-1 rounded-lg">{cartItem.qty} in cart</span>}
+                            
+                            <div className="mt-2 sm:hidden w-full">
+                                {cartItem ? (
+                                    <div className="w-full bg-palmeGreen text-white font-bold py-1.5 rounded-lg flex items-center justify-between px-2">
+                                        <button onClick={() => decreaseQty(product._id)} className="p-1 hover:bg-green-800 rounded-full">
+                                            {cartItem.qty === minRequired ? <Trash2 size={14} /> : <Minus size={14} />}
+                                        </button>
+                                        <span className="text-sm">{cartItem.qty}</span>
+                                        <button onClick={() => addToCart(product)} className="p-1 hover:bg-green-800 rounded-full">
+                                            <Plus size={14} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button 
+                                        onClick={() => { addToCart(product); toast.success(`Added`); }} 
+                                        className="w-full bg-gray-900 text-white font-bold py-1.5 rounded-lg text-xs flex items-center justify-center gap-1"
+                                    >
+                                        <Plus size={14} /> Add
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </motion.div>
@@ -212,7 +228,7 @@ const ProductShowcase = ({ limit }) => {
        </div>
 
        {limit && (
-           <div className="mt-16 text-center md:hidden">
+           <div className="mt-12 sm:mt-16 text-center md:hidden">
                <Link to="/shop" className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-full font-bold shadow-xl">
                    View All Products <ArrowRight size={16} />
                </Link>
@@ -249,18 +265,17 @@ const ProductShowcase = ({ limit }) => {
                             
                             {selectedProduct.isBulkSupply && (
                                 <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 mb-4 w-max">
-                                    <p className="text-xs text-blue-600 font-bold uppercase tracking-wider mb-1">Bulk Supply Exclusive</p>
+                                    <p className="text-xs text-blue-600 font-bold uppercase tracking-wider mb-1">Wholesale Item</p>
                                     <p className="text-sm text-blue-800">
                                         Min Order: {selectedProduct.bulkMinQty} {selectedProduct.bulkUnitLabel}{selectedProduct.bulkMinQty > 1 ? 's' : ''}
-                                        <span className="text-blue-500 ml-1">({selectedProduct.bulkMinQty * (selectedProduct.itemsPerBulkUnit || 1)} individual bottles)</span>
                                     </p>
-                                    <p className="text-xs text-blue-500 mt-1">Base price above is per individual bottle.</p>
+                                    <p className="text-xs text-blue-500 mt-1">Price is per {selectedProduct.bulkUnitLabel}. Contains {selectedProduct.itemsPerBulkUnit} units.</p>
                                 </div>
                             )}
                             
                             {selectedProduct.isWholesale && selectedProduct.moq > 0 && !selectedProduct.isBulkSupply && (
                                 <p className="text-xs text-palmeGreen font-bold mb-4 bg-green-50 inline-block px-2 py-1 rounded w-max">
-                                    Wholesale: ₦{Number(selectedProduct.wholesalePrice).toLocaleString()} / unit (Min {selectedProduct.moq})
+                                    Wholesale Tier: ₦{Number(selectedProduct.wholesalePrice).toLocaleString()} / unit (Min {selectedProduct.moq})
                                 </p>
                             )}
                             

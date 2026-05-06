@@ -57,9 +57,7 @@ const CartDrawer = () => {
             cartItems.map((item) => {
               const isWholesaleActive = item.isWholesale && item.qty >= item.moq;
               const activePrice = isWholesaleActive ? item.wholesalePrice : item.price;
-              
-              
-              const minRequired = item.isBulkSupply ? (item.bulkMinQty || 1) * (item.itemsPerBulkUnit || 1) : 1;
+              const minRequired = item.isBulkSupply ? (item.bulkMinQty || 1) : 1;
               const isAtBulkMinimum = item.isBulkSupply && item.qty <= minRequired;
 
               return (
@@ -79,7 +77,8 @@ const CartDrawer = () => {
                     
                     <p className="text-sm text-gray-500 mt-1">
                         {item.size} 
-                        {item.isBulkSupply && ` • 1 ${item.bulkUnitLabel} = ${item.itemsPerBulkUnit || 1} units`}
+                        
+                        {item.isBulkSupply && ` • Sold per ${item.bulkUnitLabel}`}
                     </p>
                   </div>
                   

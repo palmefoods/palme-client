@@ -32,9 +32,7 @@ export const CartProvider = ({ children }) => {
       }
       
       
-      const initialQty = (product.isBulkSupply && product.bulkMinQty > 0) 
-        ? product.bulkMinQty * (product.itemsPerBulkUnit || 1) 
-        : 1;
+      const initialQty = (product.isBulkSupply && product.bulkMinQty > 0) ? product.bulkMinQty : 1;
         
       return [...prev, { ...product, qty: initialQty }];
     });
@@ -45,9 +43,7 @@ export const CartProvider = ({ children }) => {
         const existing = prev.find(item => item._id === id);
         
         
-        const minRequired = existing.isBulkSupply 
-            ? (existing.bulkMinQty || 1) * (existing.itemsPerBulkUnit || 1) 
-            : 1;
+        const minRequired = existing.isBulkSupply ? (existing.bulkMinQty || 1) : 1;
 
         if (existing.isBulkSupply && existing.qty <= minRequired) {
             return prev; 
