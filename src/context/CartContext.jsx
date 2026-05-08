@@ -37,7 +37,6 @@ export const CartProvider = ({ children }) => {
       return [...prev, { ...product, qty: initialQty }];
     });
   };
-
   const decreaseQty = (id) => {
     setCartItems(prev => {
         const existing = prev.find(item => item._id === id);
