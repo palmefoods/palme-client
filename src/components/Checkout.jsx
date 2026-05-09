@@ -28,6 +28,7 @@ const Checkout = () => {
     const [customTip, setCustomTip] = useState(''); 
 
     const [parks, setParks] = useState([]);
+    const [liveProducts, setLiveProducts] = useState([]);
     const [settings, setSettings] = useState({
         doorstep_price: 10000,
         park_price: 5000,
@@ -41,12 +42,15 @@ const Checkout = () => {
         const fetchData = async () => {
             try {
                 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-                const [parksRes, settingsRes] = await Promise.all([
+               
+                const [parksRes, settingsRes, productsRes] = await Promise.all([
                     axios.get(`${API_URL}/api/locations`),
-                    axios.get(`${API_URL}/api/settings`)
+                    axios.get(`${API_URL}/api/settings`),
+                    axios.get(`${API_URL}/api/products`)
                 ]);
 
                 if (Array.isArray(parksRes.data)) setParks(parksRes.data);
+                if (Array.isArray(productsRes.data)) setLiveProducts(productsRes.data);
 
                 if (settingsRes.data) {
                     const settingsObj = Array.isArray(settingsRes.data) 
@@ -205,14 +209,36 @@ const Checkout = () => {
    
     const isFormValid = () => {
         if (!email || !email.includes('@')) return false;
-        if (!phone || phone.replace(/\D/g, '').length < 10) return false;
+        if (!phone || phone.replace(/\D/g, '').length < 10) return false; 
         if (deliveryType === 'doorstep' && !address) return false;
         if (deliveryType === 'international' && !address) return false;
         if (deliveryType === 'park' && !selectedLocation) return false;
+        
+       
+        if (liveProducts.length > 0) {
+            for (const item of cartItems) {
+                const liveItem = liveProducts.find(p => p.name === item.name);
+                if (liveItem && liveItem.stock < item.qty) {
+                    return false; 
+                }
+            }
+        }
         return true;
     };
 
     const handleValidationFail = () => {
+       
+        if (liveProducts.length > 0) {
+            for (const item of cartItems) {
+                const liveItem = liveProducts.find(p => p.name === item.name);
+                if (liveItem && liveItem.stock < item.qty) {
+                    toast.error(`🛑 Stock Alert: Only ${liveItem.stock} available for "${item.name}". Please reduce your cart quantity.`);
+                    return;
+                }
+            }
+        }
+
+       
         if (!email || !email.includes('@')) toast.error("Please enter a valid email address.");
         else if (!phone || phone.replace(/\D/g, '').length < 10) toast.error("Please enter a valid active phone number.");
         else if (deliveryType === 'doorstep' && !address) toast.error("Please provide your full delivery address.");
@@ -384,7 +410,6 @@ const Checkout = () => {
                                 onChange={e => setAddress(e.target.value)}
                             />
                         ) : (
-                           
                             <input 
                                 type="text" 
                                 placeholder="Full Street Address (e.g., House Number, Street Name, Landmark)" 
@@ -419,25 +444,35 @@ const Checkout = () => {
             <div className="w-full lg:w-[42%] bg-[#FAFAFA] border-l border-gray-200 pt-10 px-6 lg:pl-10 lg:pr-14 order-1 lg:order-2">
                 <div className="lg:sticky lg:top-10 max-w-md mx-auto lg:mx-0">
                     <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-                        {cartItems.map((item) => (
-                            <div key={item._id} className="flex justify-between items-center">
+                        {cartItems.map((item) => {
+                           
+                            const liveItem = liveProducts.find(p => p.name === item.name);
+                            const isExceeding = liveItem && liveItem.stock < item.qty;
+
+                            return (
+                            <div key={item._id} className="flex justify-between items-center bg-white p-2 rounded-xl border">
                                 <div className="flex items-center gap-4">
                                     <div className="relative">
-                                        <div className="w-16 h-16 rounded-xl border border-gray-200 bg-white flex items-center justify-center overflow-hidden">
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-contain p-2" />
+                                        <div className={`w-14 h-14 rounded-lg border bg-white flex items-center justify-center overflow-hidden ${isExceeding ? 'border-red-500' : 'border-gray-200'}`}>
+                                            <img src={item.image} alt={item.name} className="w-full h-full object-contain p-1" />
                                         </div>
-                                        <span className="absolute -top-2 -right-2 w-5 h-5 bg-gray-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                        <span className={`absolute -top-2 -right-2 w-5 h-5 text-white text-[10px] font-bold rounded-full flex items-center justify-center ${isExceeding ? 'bg-red-600 animate-pulse' : 'bg-gray-600'}`}>
                                             {item.qty}
                                         </span>
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-bold text-gray-800 font-serif">{item.name}</h3>
-                                        <p className="text-xs text-gray-500">{item.size}</p>
+                                        <h3 className="text-xs font-bold text-gray-800 font-serif line-clamp-1">{item.name}</h3>
+                                        <p className="text-[10px] text-gray-500">{item.size}</p>
+                                        {isExceeding && (
+                                            <span className="text-[9px] font-bold text-red-600 block mt-0.5 uppercase">
+                                                Only {liveItem.stock} left
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
-                                <span className="text-sm font-medium text-gray-800">₦{(item.price * item.qty).toLocaleString()}</span>
+                                <span className="text-xs font-medium text-gray-800">₦{(item.price * item.qty).toLocaleString()}</span>
                             </div>
-                        ))}
+                        )})}
                     </div>
 
                     <div className="space-y-3 pb-6 border-b border-gray-200">

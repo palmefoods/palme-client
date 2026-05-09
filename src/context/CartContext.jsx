@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import toast from 'react-hot-toast'; 
 
 const CartContext = createContext();
 
@@ -25,24 +26,28 @@ export const CartProvider = ({ children }) => {
   const addToCart = (product) => {
     setCartItems(prev => {
       const existing = prev.find(item => item._id === product._id);
+      const currentQty = existing ? existing.qty : 0;
+      const increment = (product.isBulkSupply && product.bulkMinQty > 0) ? product.bulkMinQty : 1;
+      
+      
+      if (currentQty + increment > (product.stock || 0)) {
+          toast.error(`🛑 Stock Limit: Only ${product.stock} units available for "${product.name}".`);
+          return prev; 
+      }
+
       if (existing) {
         return prev.map(item => 
           item._id === product._id ? { ...item, qty: item.qty + 1 } : item
         );
       }
-      
-      
-      const initialQty = (product.isBulkSupply && product.bulkMinQty > 0) ? product.bulkMinQty : 1;
         
-      return [...prev, { ...product, qty: initialQty }];
+      return [...prev, { ...product, qty: increment }];
     });
   };
-  
+
   const decreaseQty = (id) => {
     setCartItems(prev => {
         const existing = prev.find(item => item._id === id);
-        
-        
         const minRequired = existing.isBulkSupply ? (existing.bulkMinQty || 1) : 1;
 
         if (existing.isBulkSupply && existing.qty <= minRequired) {
