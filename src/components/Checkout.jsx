@@ -82,7 +82,6 @@ const Checkout = () => {
 
     const filteredParks = Array.isArray(parks) ? parks.filter(p => p?.state?.toLowerCase() === selectedState.toLowerCase()) : [];
     
-    
     let shippingFee = 0;
     
     if (deliveryType === 'park') {
@@ -157,7 +156,7 @@ const Checkout = () => {
 
         const orderData = {
             paymentReference: reference.reference, 
-            customer: { name: `${firstName} ${lastName}`, email, phone, address },
+            customer: { name: `${firstName} ${lastName}`.trim(), email, phone, address },
             items: cartItems,
             deliveryMethod: deliveryType,
             parkLocation: selectedLocation ? (selectedLocation.name || selectedLocation.parkName) : (deliveryType === 'international' ? 'Overseas' : ''),
@@ -203,9 +202,10 @@ const Checkout = () => {
         reference: reference, 
     };
 
-    
+   
     const isFormValid = () => {
-        if (!email) return false;
+        if (!email || !email.includes('@')) return false;
+        if (!phone || phone.replace(/\D/g, '').length < 10) return false;
         if (deliveryType === 'doorstep' && !address) return false;
         if (deliveryType === 'international' && !address) return false;
         if (deliveryType === 'park' && !selectedLocation) return false;
@@ -213,10 +213,11 @@ const Checkout = () => {
     };
 
     const handleValidationFail = () => {
-        if (!email) toast.error("Enter email");
-        else if (deliveryType === 'doorstep' && !address) toast.error("Enter address");
-        else if (deliveryType === 'international' && !address) toast.error("Enter your country and address");
-        else if (deliveryType === 'park' && !selectedLocation) toast.error("Select park");
+        if (!email || !email.includes('@')) toast.error("Please enter a valid email address.");
+        else if (!phone || phone.replace(/\D/g, '').length < 10) toast.error("Please enter a valid active phone number.");
+        else if (deliveryType === 'doorstep' && !address) toast.error("Please provide your full delivery address.");
+        else if (deliveryType === 'international' && !address) toast.error("Please enter your complete international destination address.");
+        else if (deliveryType === 'park' && !selectedLocation) toast.error("Please select an available pickup park.");
     };
 
     return (
@@ -258,9 +259,7 @@ const Checkout = () => {
                         </div>
                     )}
 
-                    
                     <div className="border border-gray-300 rounded-lg overflow-hidden">
-                        
                         
                         <div 
                             className={`flex items-center justify-between p-4 cursor-pointer border-b border-gray-200 transition-colors ${deliveryType === 'park' ? 'bg-palmeGreen/10' : 'bg-white'}`}
@@ -279,7 +278,6 @@ const Checkout = () => {
                             </span>
                         </div>
 
-                        
                         <div 
                             className={`flex items-center justify-between p-4 cursor-pointer border-b border-gray-200 transition-colors ${deliveryType === 'doorstep' ? 'bg-palmeGreen/10' : 'bg-white'}`}
                             onClick={() => setDeliveryType('doorstep')}
@@ -290,11 +288,9 @@ const Checkout = () => {
                                 </div>
                                 <span className="text-sm font-bold text-gray-800">Doorstep Delivery</span>
                             </div>
-                            {/* 🚀 UPDATED: Doorstep visual changed to Calculated Later */}
                             <span className="text-sm font-bold text-gray-900 flex items-center gap-1">Calculated Later</span>
                         </div>
 
-                        
                         <div 
                             className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${deliveryType === 'international' ? 'bg-blue-50' : 'bg-white'}`}
                             onClick={() => setDeliveryType('international')}
@@ -315,7 +311,6 @@ const Checkout = () => {
                     </div>
                 </section>
 
-                
                 <div className={`mb-8 p-4 rounded-lg border flex gap-3 animate-fade-in ${deliveryType === 'international' ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}>
                     <div className={`mt-0.5 ${deliveryType === 'international' ? 'text-blue-500' : 'text-palmeGreen'}`}><Info size={18} /></div>
                     <div className="text-sm text-gray-700 leading-relaxed">
@@ -331,7 +326,6 @@ const Checkout = () => {
                 <section className="mb-10">
                     <h2 className="text-lg font-bold text-gray-800 mb-4">Shipping Address</h2>
                     <div className="space-y-3">
-                        
                         
                         {deliveryType !== 'international' && (
                             <div className="relative">
@@ -390,7 +384,14 @@ const Checkout = () => {
                                 onChange={e => setAddress(e.target.value)}
                             />
                         ) : (
-                            <input type="text" placeholder="Street Address" className="w-full p-3.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-palmeGreen text-sm" value={address} onChange={e => setAddress(e.target.value)}/>
+                           
+                            <input 
+                                type="text" 
+                                placeholder="Full Street Address (e.g., House Number, Street Name, Landmark)" 
+                                className="w-full p-3.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-palmeGreen text-sm" 
+                                value={address} 
+                                onChange={e => setAddress(e.target.value)}
+                            />
                         )}
                     </div>
                 </section>
@@ -477,7 +478,6 @@ const Checkout = () => {
                                 <span>Shipping</span>
                                 <HelpCircle size={12} className="text-gray-400" />
                             </div>
-                            {/* 🚀 UPDATED: Order summary correctly groups doorstep with international visual */}
                             <span className="font-medium text-gray-900">
                                 {(deliveryType === 'international' || deliveryType === 'doorstep') ? 'Calculated Later' : `₦${shippingFee.toLocaleString()}`}
                             </span>
