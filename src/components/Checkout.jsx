@@ -158,10 +158,8 @@ const Checkout = () => {
     const handlePaystackSuccessAction = async (reference) => {
         toast.success("Payment Verified! Creating Order...", { duration: 4000 });
 
-        
         let formattedAddress = address;
         if (deliveryType !== 'international' && selectedState) {
-            
             formattedAddress = address.toLowerCase().includes(selectedState.toLowerCase()) 
                 ? address 
                 : `${address}, ${selectedState}`;
@@ -219,11 +217,10 @@ const Checkout = () => {
     const isFormValid = () => {
         if (!email || !email.includes('@')) return false;
         if (!phone || phone.replace(/\D/g, '').length < 10) return false; 
-        if (deliveryType === 'doorstep' && !address) return false;
+        if (deliveryType === 'doorstep' && (!selectedState || !address)) return false;
         if (deliveryType === 'international' && !address) return false;
-        if (deliveryType === 'park' && !selectedLocation) return false;
+        if (deliveryType === 'park' && (!selectedState || !selectedLocation)) return false;
         
-       
         if (liveProducts.length > 0) {
             for (const item of cartItems) {
                 const liveItem = liveProducts.find(p => p.name === item.name);
@@ -236,7 +233,6 @@ const Checkout = () => {
     };
 
     const handleValidationFail = () => {
-       
         if (liveProducts.length > 0) {
             for (const item of cartItems) {
                 const liveItem = liveProducts.find(p => p.name === item.name);
@@ -247,11 +243,12 @@ const Checkout = () => {
             }
         }
 
-       
         if (!email || !email.includes('@')) toast.error("Please enter a valid email address.");
         else if (!phone || phone.replace(/\D/g, '').length < 10) toast.error("Please enter a valid active phone number.");
+        else if (deliveryType === 'doorstep' && !selectedState) toast.error("Please select a state for doorstep delivery.");
         else if (deliveryType === 'doorstep' && !address) toast.error("Please provide your full delivery address.");
         else if (deliveryType === 'international' && !address) toast.error("Please enter your complete international destination address.");
+        else if (deliveryType === 'park' && !selectedState) toast.error("Please select a state to view available parks.");
         else if (deliveryType === 'park' && !selectedLocation) toast.error("Please select an available pickup park.");
     };
 
