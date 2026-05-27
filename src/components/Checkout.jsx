@@ -158,9 +158,18 @@ const Checkout = () => {
     const handlePaystackSuccessAction = async (reference) => {
         toast.success("Payment Verified! Creating Order...", { duration: 4000 });
 
+        
+        let formattedAddress = address;
+        if (deliveryType !== 'international' && selectedState) {
+            
+            formattedAddress = address.toLowerCase().includes(selectedState.toLowerCase()) 
+                ? address 
+                : `${address}, ${selectedState}`;
+        }
+
         const orderData = {
             paymentReference: reference.reference, 
-            customer: { name: `${firstName} ${lastName}`.trim(), email, phone, address },
+            customer: { name: `${firstName} ${lastName}`.trim(), email, phone, address: formattedAddress },
             items: cartItems,
             deliveryMethod: deliveryType,
             parkLocation: selectedLocation ? (selectedLocation.name || selectedLocation.parkName) : (deliveryType === 'international' ? 'Overseas' : ''),
