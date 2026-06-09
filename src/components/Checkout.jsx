@@ -275,7 +275,7 @@ const Checkout = () => {
                         <h2 className="text-lg font-bold text-gray-800">Contact</h2>
                         {!user && <div className="text-sm">Already have an account? <button onClick={() => setShowAuthModal(true)} className="text-palmeGreen font-bold underline">Log in</button></div>}
                     </div>
-                    <input type="email" placeholder="Email or mobile phone number" className="w-full p-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-palmeGreen outline-none text-sm" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <input type="email" placeholder="Email address" className="w-full p-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-palmeGreen outline-none text-sm" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </section>
 
                 <section className="mb-8">
