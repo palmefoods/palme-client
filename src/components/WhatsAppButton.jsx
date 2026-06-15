@@ -17,10 +17,11 @@ const WhatsAppButton = () => {
       target="_blank" 
       rel="noopener noreferrer"
       
-      className={`fixed bottom-8 right-8 z-[100] group transition-all duration-500 ease-in-out ${
+      
+      className={`fixed bottom-8 right-8 z-[100] group transition-transform duration-700 ease-in-out ${
         isCartOpen 
-          ? 'translate-x-40 opacity-0 pointer-events-none' 
-          : 'translate-x-0 opacity-100'
+          ? '-translate-x-[calc(100vw-8rem)]' 
+          : 'translate-x-0'
       }`}
       aria-label="Chat on WhatsApp"
     >
