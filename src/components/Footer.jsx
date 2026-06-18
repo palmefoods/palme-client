@@ -128,7 +128,7 @@ const Footer = () => {
 
       <div className="border-t border-gray-800 pt-8 text-center">
         <p className="text-xs text-gray-600">
-           &copy; {new Date().getFullYear()} PalmeFoods Nigeria Limited. | Developed by <a href="https://github.com/Code-Warlock" target="_blank" rel="noopener noreferrer" className="text-palmeGreen hover:underline">CodeWarlock</a>
+           &copy; {new Date().getFullYear()} PalmeFoods Nigeria Limited. | Developed by <a href="https://github.com/Code-Warlock" target="_blank" rel="noopener noreferrer" className="text-palmeGreen hover:underline">Code Warlock</a>
         </p>
       </div>
     </footer>
