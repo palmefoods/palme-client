@@ -5,7 +5,8 @@ import { useCart } from '../context/CartContext';
 import { PaystackButton } from 'react-paystack'; 
 import { useAuth } from '../context/AuthContext';
 
-import { ChevronRight, HelpCircle, Lock, AlertCircle, Tag, X, Truck, Info, Heart, Globe } from 'lucide-react';
+
+import { ChevronRight, HelpCircle, Lock, AlertCircle, Tag, X, Truck, Info, Heart, Globe, MapPin } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
 const Checkout = () => {
@@ -404,6 +405,19 @@ const Checkout = () => {
                                                 </option>
                                             ))}
                                         </select>
+                                        
+                                        {/* 👇 NEW: Displays the park description if available */}
+                                        {selectedLocation && selectedLocation.address && (
+                                            <div className="mt-3 bg-white p-3 rounded-md border border-gray-200 text-sm animate-fade-in">
+                                                <div className="flex items-start gap-2">
+                                                    <MapPin className="text-palmeGreen shrink-0 mt-0.5" size={16} />
+                                                    <div>
+                                                        <span className="block text-[10px] font-bold text-gray-500 uppercase mb-0.5">Park Details & Directions</span>
+                                                        <span className="text-gray-700 leading-relaxed text-xs">{selectedLocation.address}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
